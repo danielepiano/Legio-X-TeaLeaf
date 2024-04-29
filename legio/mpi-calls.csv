@@ -1,0 +1,11 @@
+FUNCTION,LEGIO SUPPORTED,NOTES
+MPI_Init,yes,
+MPI_Finalize,yes,
+MPI_Comm_ranks,yes,
+MPI_Comm_size,yes,
+MPI_Barrier,yes,
+MPI_Isend,yes,
+MPI_Irecv,yes,
+MPI_Waitall,no,iterate MPI_Wait || setup topology and exploit related calls
+MPI_Reduce,yes,
+MPI_Allreduce,yes
