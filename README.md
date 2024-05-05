@@ -11,8 +11,8 @@ affected by failures.
 ## 👨‍👨‍👦‍👦 Authors
 
 - Daniele Piano [@danielepiano](https://github.com/danielepiano)
-- Federico Martinis [@MartinisFederico]((https://github.com/MartinisFederico))
-- Roberto Rocco [@Robyroc]((https://github.com/Robyroc)) :: as supervisor
+- Federico Martinis [@MartinisFederico](https://github.com/MartinisFederico)
+- Roberto Rocco [@Robyroc](https://github.com/Robyroc) :: as supervisor
 - prof. [Gianluca Palermo](https://palermo.faculty.polimi.it/) :: as project responsible
 
 ## _Legio_ :: About
