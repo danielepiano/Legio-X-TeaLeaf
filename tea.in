@@ -21,4 +21,5 @@ eps 1.0e-15
 test_problem 5
 profiler_on
 use_c_kernels
+visit_frequency=5
 *endtea

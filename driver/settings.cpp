@@ -13,6 +13,12 @@ void set_default_settings(Settings &settings) {
   settings.tea_out_filename = (char *)malloc(sizeof(char) * MAX_CHAR_LEN);
   strncpy(settings.tea_out_filename, DEF_TEA_OUT_FILENAME, MAX_CHAR_LEN);
 
+  settings.tea_visit_filename = (char *)malloc(sizeof(char) * MAX_CHAR_LEN);
+  strncpy(settings.tea_visit_filename, DEF_TEA_VISIT_FILENAME, MAX_CHAR_LEN);
+
+  settings.tea_vtk_path_name = (char *)malloc(sizeof(char) * MAX_CHAR_LEN);
+  strncpy(settings.tea_vtk_path_name, DEF_TEA_VTK_PATHNAME, MAX_CHAR_LEN);
+
   settings.tea_out_fp = nullptr;
   settings.grid_x_min = DEF_GRID_X_MIN;
   settings.grid_y_min = DEF_GRID_Y_MIN;
@@ -26,6 +32,7 @@ void set_default_settings(Settings &settings) {
   settings.end_time = DEF_END_TIME;
   settings.end_step = DEF_END_STEP;
   settings.summary_frequency = DEF_SUMMARY_FREQUENCY;
+  settings.visit_frequency = DEF_VISIT_FREQUENCY;
   settings.solver = DEF_SOLVER;
   settings.staging_buffer_preference = DEF_STAGING_BUFFER;
   settings.model_name = "";

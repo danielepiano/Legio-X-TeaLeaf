@@ -242,6 +242,7 @@ set(MODEL_SRC
         pack_halos.cpp
         ppcg.cpp
         solver_methods.cpp
+        vtk_visitor.cpp
         )
 
 # register out models <model_name> <preprocessor_def_name> <source files...>

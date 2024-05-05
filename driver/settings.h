@@ -10,6 +10,8 @@
 #define DEF_TEA_IN_FILENAME "tea.in"
 #define DEF_TEA_OUT_FILENAME "tea.out"
 #define DEF_TEST_PROBLEM_FILENAME "tea.problems"
+#define DEF_TEA_VISIT_FILENAME "tea.visit"
+#define DEF_TEA_VTK_PATHNAME "target/vtk-dumps/"
 #define DEF_GRID_X_MIN 0.0
 #define DEF_GRID_Y_MIN 0.0
 #define DEF_GRID_Z_MIN 0.0
@@ -25,6 +27,7 @@
 #define DEF_END_TIME 10.0
 #define DEF_END_STEP INT32_MAX
 #define DEF_SUMMARY_FREQUENCY 10
+#define DEF_VISIT_FREQUENCY 0
 #define DEF_KERNEL_LANGUAGE C
 #define DEF_COEFFICIENT CONDUCTIVITY
 #define DEF_ERROR_SWITCH 0
@@ -93,6 +96,10 @@ struct Settings {
   char *tea_in_filename;
   char *tea_out_filename;
   char *test_problem_filename;
+
+  int visit_frequency;
+  char *tea_visit_filename;
+  char *tea_vtk_path_name;
 
   Solver solver;
   char *solver_name;

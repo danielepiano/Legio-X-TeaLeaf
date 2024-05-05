@@ -1,6 +1,7 @@
 #include "application.h"
 #include "comms.h"
 #include "drivers.h"
+#include "vtk_visitor.h"
 
 double calc_dt(Chunk *chunks);
 void calc_min_timestep(Chunk *chunks, double *dt, int chunks_per_task);
@@ -9,16 +10,21 @@ void solve(Chunk *chunks, Settings &settings, int tt, double *wallclock_prev);
 // The main timestep loop
 bool diffuse(Chunk *chunks, Settings &settings) {
   double wallclock_prev = 0.0;
-  for (int tt = 0; tt < settings.end_step; ++tt) {
+  int tt = 0;
+
+  if (settings.visit_frequency) visit(tt, chunks, settings);
+
+  for (tt = 1; tt <= settings.end_step; ++tt) {
     solve(chunks, settings, tt, &wallclock_prev);
   }
 
+  if (settings.visit_frequency) visit(tt, chunks, settings);
   return field_summary_driver(chunks, settings, true);
 }
 
 // Performs a solve for a single timestep
 void solve(Chunk *chunks, Settings &settings, int tt, double *wallclock_prev) {
-  print_and_log(settings, "\n Timestep %d\n", tt + 1);
+  print_and_log(settings, "\n Timestep %d\n", tt);
   profiler_start_timer(settings.wallclock_profile);
 
   // Calculate minimum timestep information
@@ -52,6 +58,9 @@ void solve(Chunk *chunks, Settings &settings, int tt, double *wallclock_prev) {
 
   if (tt % settings.summary_frequency == 0) {
     field_summary_driver(chunks, settings, false);
+  }
+  if (tt % settings.visit_frequency == 0) {
+    visit(tt, chunks, settings);
   }
 
   profiler_end_timer(settings.wallclock_profile, "Wallclock");

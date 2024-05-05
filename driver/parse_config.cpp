@@ -47,6 +47,7 @@ void read_config(Settings &settings, State **states) {
   print_to_log(settings, "\tcoefficient = %d\n", settings.coefficient);
   print_to_log(settings, "\tnum_chunks_per_rank = %d\n", settings.num_chunks_per_rank);
   print_to_log(settings, "\tsummary_frequency = %d\n", settings.summary_frequency);
+  print_to_log(settings, "\tvisit_frequency = %d\n", settings.visit_frequency);
 
   for (int ss = 0; ss < settings.num_states; ++ss) {
     print_to_log(settings, "\t\nstate %d\n", ss);
@@ -83,6 +84,7 @@ void read_settings(FILE *tea_in, Settings &settings) {
     if (settings.grid_x_cells == DEF_GRID_X_CELLS && starts_get_int("x_cells", line, word, &settings.grid_x_cells)) continue;
     if (settings.grid_y_cells == DEF_GRID_Y_CELLS && starts_get_int("y_cells", line, word, &settings.grid_y_cells)) continue;
     if (starts_get_int("summary_frequency", line, word, &settings.summary_frequency)) continue;
+    if (starts_get_int("visit_frequency", line, word, &settings.visit_frequency)) continue;
     if (starts_get_int("presteps", line, word, &settings.presteps)) continue;
     if (starts_get_int("ppcg_inner_steps", line, word, &settings.ppcg_inner_steps)) continue;
     if (starts_get_double("epslim", line, word, &settings.eps_lim)) continue;

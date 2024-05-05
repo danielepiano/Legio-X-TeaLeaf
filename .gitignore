@@ -18,6 +18,8 @@ tealeaf.*
 *.optrpt
 src.*
 tags
+target
+*.vtk
 
 # CMake
 cmake-build-*/
