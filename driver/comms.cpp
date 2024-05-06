@@ -27,7 +27,10 @@ void send_recv_message(Settings &settings, double *send_buffer, double *recv_buf
 // Waits for all requests to complete
 void wait_for_requests(Settings &settings, int num_requests, MPI_Request *requests) {
   START_PROFILING(settings.kernel_profile);
-  MPI_Waitall(num_requests, requests, MPI_STATUSES_IGNORE);
+  // MPI_Waitall(num_requests, requests, MPI_STATUSES_IGNORE);
+  for (int rr = 0; rr < num_requests; ++rr) {
+    MPI_Wait(&requests[rr], MPI_STATUS_IGNORE);
+  }
   STOP_PROFILING(settings.kernel_profile, __func__);
 }
 
