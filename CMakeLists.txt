@@ -178,6 +178,8 @@ if (FETCH_TBB)
     endif ()
 endif ()
 
+find_package(legio REQUIRED)
+
 option(USE_ONEDPL "Enable oneDPL library for *supported* models. Enabling this on models that
                    don't explicitly link against DPL is a no-op, see description of your selected
                    model on how this is used." OFF)
@@ -375,7 +377,7 @@ include_directories(${CMAKE_BINARY_DIR}/generated)
 
 
 add_executable(${EXE_NAME} ${IMPL_SOURCES})
-target_link_libraries(${EXE_NAME} PUBLIC ${LINK_LIBRARIES} m)
+target_link_libraries(${EXE_NAME} PUBLIC ${LINK_LIBRARIES} m legio::legio)
 target_compile_definitions(${EXE_NAME} PUBLIC ${IMPL_DEFINITIONS})
 target_include_directories(${EXE_NAME} PUBLIC driver)
 

@@ -40,30 +40,54 @@ particular order.
 | SYCL                      |     `sycl-acc`     |
 | SYCL 2020                 |  ^ or `sycl-usm`   |
 
-## Building
+## Installing _Legio_
 
 ### Prerequisites
 
-* CMake >= 3.13.0
+* CMake >= 3.10
+* ULFM features in MPI implementation
 
-### CMake
+### Steps
+
+Follow the steps defined in [Legio](https://github.com/Robyroc/Legio) repository.
+
+## Building _TeaLeaf_ linking _Legio_
+
+### Prerequisites
+
+* CMake >= 3.13
+
+### Steps
 
 ```shell
 # Configure the build
 # 'Release' as default build-type
 # -DMODEL option is required
-foo@bar:~/path/to/Legio-X-TeaLeaf$ cmake -Bbuild -H. -DMODEL=<model> -DENABLE_MPI=ON <model options through -D...>
+foo@bar:~/path/to/Legio-X-TeaLeaf$ cmake -Bbuild -H. -DMODEL=<model> -DENABLE_MPI=ON <model options through -D...> -Dlegio_DIR=<path/to/Legio/install/lib/cmake>
 
 # Compile
 foo@bar:~/path/to/Legio-X-TeaLeaf$ cmake --build build
-
-# Run executables in ./build
-foo@bar:~/path/to/Legio-X-TeaLeaf$ ./build/<model>-tealeaf
-foo@bar:~/path/to/Legio-X-TeaLeaf$ mpirun -n <num_ranks> ./build/<model>-tealeaf
 ```
 
-The `MODEL` option selects the **programming model** implementation of _TeaLeaf_ to build (**references** shown above).
-The source code for each model's implementations are located in `./src/<model>`.
+### Notes
+
+* `MODEL` :: selects the **programming model** implementation of _TeaLeaf_ to build (**references** shown above); the
+  source code for each model's implementations is located in `./src/<model>`
+
+## Executing _Legio-X-TeaLeaf_
+
+### Steps
+
+```shell
+# Run executables in ./build
+foo@bar:~/path/to/Legio-X-TeaLeaf$ <mpirun> -n <num_ranks> --with-ft ulfm ./build/<model>-tealeaf
+```
+
+### Notes
+
+* `<mpirun>` :: _mpirun_ executable with ULFM features
+* `--with-ft ulfm` :: fault-tolerance support via ULFM (built-in by default in _OpenMPI v5.0.x_)
+* `./build/<model>-tealeaf` :: executable path and filename generated according to the defined `model
 
 ## _TeaLeaf_ref_ :: File Input
 
