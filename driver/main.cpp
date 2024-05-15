@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
   print_and_log(settings, " - Ver.:     %s\n", TEALEAF_VERSION);
   print_and_log(settings, " - Deck:     %s\n", settings.tea_in_filename);
   print_and_log(settings, " - Out:      %s\n", settings.tea_out_filename);
-  print_and_log(settings, " - Problem:  %s\n", settings.test_problem_filename);
+  print_and_log(settings, " - Problem:  %s\n", settings.check_result ? settings.test_problem_filename : "-");
   print_and_log(settings, " - Solver:   %s\n", settings.solver_name);
   print_and_log(settings, " - Profiler: %s\n", profiling ? "true" : "false");
   print_and_log(settings, "Model:\n");
