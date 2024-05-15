@@ -8,10 +8,10 @@
 
 // Default settings
 #define DEF_TEA_IN_FILENAME "tea.in"
-#define DEF_TEA_OUT_FILENAME "tea.out"
+#define DEF_TEA_OUT_FILENAME "target/tea.out"
 #define DEF_TEST_PROBLEM_FILENAME "tea.problems"
 #define DEF_TEA_VISIT_FILENAME "tea.visit"
-#define DEF_TEA_VTK_PATHNAME "target/vtk-dumps/"
+#define DEF_TEA_VTK_PATHNAME "target/vtk/"
 #define DEF_GRID_X_MIN 0.0
 #define DEF_GRID_Y_MIN 0.0
 #define DEF_GRID_Z_MIN 0.0
