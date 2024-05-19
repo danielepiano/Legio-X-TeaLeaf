@@ -55,48 +55,53 @@ void update_bottom(const int x, const int y, const int depth, const int halo_dep
 }
 
 // Updates faces in turn.
-void update_face(const int x, const int y, const int halo_depth, const int *chunk_neighbours, const int depth, KView &buffer) {
-  if (chunk_neighbours[CHUNK_LEFT] == EXTERNAL_FACE) {
+void update_face(const int x, const int y, const int halo_depth, const int depth, KView &buffer) {
+  int neighbours_rank[NUM_DIRECTION_NEIGHBOURS];
+
+  get_cart_neighbours_rank(X_AXIS, 1, neighbours_rank);
+  if (neighbours_rank[LEFT] == MPI_PROC_NULL) {
     update_left(x, y, depth, halo_depth, buffer);
   }
-  if (chunk_neighbours[CHUNK_RIGHT] == EXTERNAL_FACE) {
+  if (neighbours_rank[RIGHT] == MPI_PROC_NULL) {
     update_right(x, y, depth, halo_depth, buffer);
   }
-  if (chunk_neighbours[CHUNK_TOP] == EXTERNAL_FACE) {
+
+  get_cart_neighbours_rank(Y_AXIS, 1, neighbours_rank);
+  if (neighbours_rank[UP] == MPI_PROC_NULL) {
     update_top(x, y, depth, halo_depth, buffer);
   }
-  if (chunk_neighbours[CHUNK_BOTTOM] == EXTERNAL_FACE) {
+  if (neighbours_rank[DOWN] == MPI_PROC_NULL) {
     update_bottom(x, y, depth, halo_depth, buffer);
   }
 }
 
 // The kernel for updating halos locally
-void local_halos(const int x, const int y, const int depth, const int halo_depth, const int *chunk_neighbours,
-                 const bool *fields_to_exchange, KView &density, KView &energy0, KView &energy, KView &u, KView &p, KView &sd) {
+void local_halos(const int x, const int y, const int depth, const int halo_depth, const bool *fields_to_exchange, KView &density,
+                 KView &energy0, KView &energy, KView &u, KView &p, KView &sd) {
   if (fields_to_exchange[FIELD_DENSITY]) {
-    update_face(x, y, halo_depth, chunk_neighbours, depth, density);
+    update_face(x, y, halo_depth, depth, density);
   }
   if (fields_to_exchange[FIELD_P]) {
-    update_face(x, y, halo_depth, chunk_neighbours, depth, p);
+    update_face(x, y, halo_depth, depth, p);
   }
   if (fields_to_exchange[FIELD_ENERGY0]) {
-    update_face(x, y, halo_depth, chunk_neighbours, depth, energy0);
+    update_face(x, y, halo_depth, depth, energy0);
   }
   if (fields_to_exchange[FIELD_ENERGY1]) {
-    update_face(x, y, halo_depth, chunk_neighbours, depth, energy);
+    update_face(x, y, halo_depth, depth, energy);
   }
   if (fields_to_exchange[FIELD_U]) {
-    update_face(x, y, halo_depth, chunk_neighbours, depth, u);
+    update_face(x, y, halo_depth, depth, u);
   }
   if (fields_to_exchange[FIELD_SD]) {
-    update_face(x, y, halo_depth, chunk_neighbours, depth, sd);
+    update_face(x, y, halo_depth, depth, sd);
   }
 }
 
 // Solver-wide kernels
 void run_local_halos(Chunk *chunk, Settings &settings, int depth) {
   START_PROFILING(settings.kernel_profile);
-  local_halos(chunk->x, chunk->y, depth, settings.halo_depth, chunk->neighbours, settings.fields_to_exchange, *chunk->density,
-              *chunk->energy0, *chunk->energy, *chunk->u, *chunk->p, *chunk->sd);
+  local_halos(chunk->x, chunk->y, depth, settings.halo_depth, settings.fields_to_exchange, *chunk->density, *chunk->energy0, *chunk->energy,
+              *chunk->u, *chunk->p, *chunk->sd);
   STOP_PROFILING(settings.kernel_profile, __func__);
 }
