@@ -14,6 +14,12 @@
 #include "chunk.h"
 #include "settings.h"
 
+#define NUM_GRID_DIMENSIONS 2
+#define NUM_DIRECTION_NEIGHBOURS 2
+enum CART_AXIS { X_AXIS, Y_AXIS };
+enum X_DIRECTIONS { LEFT, RIGHT };
+enum Y_DIRECTIONS { DOWN, UP };
+
 void barrier();
 void abort_comms();
 void finalise_comms();
@@ -24,3 +30,6 @@ void min_over_ranks(Settings &settings, double *a);
 void wait_for_requests(Settings &settings, int num_requests, MPI_Request *requests);
 void send_recv_message(Settings &settings, double *send_buffer, double *recv_buffer, int buffer_len, int neighbour, int send_tag,
                        int recv_tag, MPI_Request *send_request, MPI_Request *recv_request);
+
+void initialise_cart_topology(int x_dimension, int y_dimension, Settings &settings);
+void get_cart_neighbours_rank(int axis, int offset, int neighbours_rank[]);

@@ -64,9 +64,6 @@ void initialise_chunk(Chunk *chunk, Settings &settings, int x, int y) {
   chunk->y = y + settings.halo_depth * 2;
   chunk->dt_init = settings.dt_init;
 
-  // Allocate the neighbour list
-  chunk->neighbours = static_cast<int *>(std::malloc(sizeof(int) * NUM_FACES));
-
   // Allocate the MPI comm buffers
   //  int lr_len = chunk->y * settings.halo_depth * NUM_FIELDS;
   //  chunk->left_send = static_cast<double *>(std::malloc(sizeof(double) * lr_len));
@@ -99,7 +96,6 @@ void initialise_chunk(Chunk *chunk, Settings &settings, int x, int y) {
 
 // Finalise the chunk
 void finalise_chunk(Chunk *chunk) {
-  free(chunk->neighbours);
   free(chunk->ext);
   //  free(chunk->left_send);
   //  free(chunk->left_recv);

@@ -66,8 +66,11 @@ struct Settings {
   // Log files
   FILE *tea_out_fp;
 
-  // Solve-wide constants
   int rank;
+  int cart_rank;
+  int *cart_coords;
+
+  // Solve-wide constants
   int end_step;
   int presteps;
   int max_iters;
@@ -114,6 +117,8 @@ struct Settings {
   // Field dimensions
   int grid_x_cells;
   int grid_y_cells;
+  int grid_x_chunks;
+  int grid_y_chunks;
 
   double grid_x_min;
   double grid_y_min;

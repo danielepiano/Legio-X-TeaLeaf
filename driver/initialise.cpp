@@ -3,6 +3,7 @@
 
 #include "application.h"
 #include "chunk.h"
+#include "comms.h"
 #include "drivers.h"
 #include "kernel_interface.h"
 #include "settings.h"
@@ -47,6 +48,12 @@ void decompose_field(Settings &settings, Chunk *chunks) {
     die(__LINE__, __FILE__, "Failed to decompose the field with given parameters.\n");
   }
 
+  settings.grid_x_chunks = x_chunks;
+  settings.grid_y_chunks = y_chunks;
+
+  // Initialise a cartesian topology given the number of ranks calculated along X and Y axis
+  initialise_cart_topology(settings.grid_x_chunks, settings.grid_y_chunks, settings);
+
   int dx = settings.grid_x_cells / x_chunks;
   int dy = settings.grid_y_cells / y_chunks;
 
@@ -56,32 +63,21 @@ void decompose_field(Settings &settings, Chunk *chunks) {
   int add_y_prev = 0;
 
   // Compute the full decomposition on all ranks
-  for (int yy = 0; yy < y_chunks; ++yy) {
+  for (int yy = 0; yy < settings.grid_y_chunks; ++yy) {
     int add_y = (yy < mod_y);
 
-    for (int xx = 0; xx < x_chunks; ++xx) {
+    for (int xx = 0; xx < settings.grid_x_chunks; ++xx) {
       int add_x = (xx < mod_x);
 
-      for (int cc = 0; cc < settings.num_chunks_per_rank; ++cc) {
-        int chunk = xx + yy * x_chunks;
-        int rank = cc + settings.rank * settings.num_chunks_per_rank;
+      if (xx == settings.cart_coords[X_AXIS] && yy == settings.cart_coords[Y_AXIS]) {
+        // [0] because forked version of TeaLeaf does not allow more than 1 chunk per rank !
+        initialise_chunk(&(chunks[0]), settings, dx + add_x, dy + add_y);
 
-        // Store the values for all chunks local to rank
-        if (rank == chunk) {
-          initialise_chunk(&(chunks[cc]), settings, dx + add_x, dy + add_y);
-
-          // Set up the mesh ranges
-          chunks[cc].left = xx * dx + add_x_prev;
-          chunks[cc].right = chunks[cc].left + dx + add_x;
-          chunks[cc].bottom = yy * dy + add_y_prev;
-          chunks[cc].top = chunks[cc].bottom + dy + add_y;
-
-          // Set up the chunk connectivity
-          chunks[cc].neighbours[CHUNK_LEFT] = (xx == 0) ? EXTERNAL_FACE : chunk - 1;
-          chunks[cc].neighbours[CHUNK_RIGHT] = (xx == x_chunks - 1) ? EXTERNAL_FACE : chunk + 1;
-          chunks[cc].neighbours[CHUNK_BOTTOM] = (yy == 0) ? EXTERNAL_FACE : chunk - x_chunks;
-          chunks[cc].neighbours[CHUNK_TOP] = (yy == y_chunks - 1) ? EXTERNAL_FACE : chunk + x_chunks;
-        }
+        // Set up the mesh ranges
+        chunks[0].left = xx * dx + add_x_prev;
+        chunks[0].right = chunks[0].left + dx + add_x;
+        chunks[0].bottom = yy * dy + add_y_prev;
+        chunks[0].top = chunks[0].bottom + dy + add_y;
       }
 
       // If chunks rounded up, maintain relative location
@@ -95,7 +91,7 @@ void decompose_field(Settings &settings, Chunk *chunks) {
 void initialise_model_info(Settings &settings) { run_model_info(settings); }
 
 // Initialise settings from input file
-void initialise_application(Chunk **chunks, Settings &settings, State* states) {
+void initialise_application(Chunk **chunks, Settings &settings, State *states) {
 
   *chunks = (Chunk *)malloc(sizeof(Chunk) * settings.num_chunks_per_rank);
 

@@ -9,9 +9,6 @@ struct Chunk {
   // Solve-wide variables
   double dt_init;
 
-  // Neighbouring ranks
-  int *neighbours;
-
   // MPI comm buffers
   FieldBufferType left_send;
   FieldBufferType left_recv;

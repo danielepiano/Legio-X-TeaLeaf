@@ -1,6 +1,8 @@
 #include "comms.h"
 #include "settings.h"
 
+MPI_Comm cart_communicator;
+
 // Initialise MPI
 void initialise_comms(int argc, char **argv) { MPI_Init(&argc, &argv); }
 
@@ -18,8 +20,8 @@ void send_recv_message(Settings &settings, double *send_buffer, double *recv_buf
                        int recv_tag, MPI_Request *send_request, MPI_Request *recv_request) {
   START_PROFILING(settings.kernel_profile);
 
-  MPI_Isend(send_buffer, buffer_len, MPI_DOUBLE, neighbour, send_tag, MPI_COMM_WORLD, send_request);
-  MPI_Irecv(recv_buffer, buffer_len, MPI_DOUBLE, neighbour, recv_tag, MPI_COMM_WORLD, recv_request);
+  MPI_Isend(send_buffer, buffer_len, MPI_DOUBLE, neighbour, send_tag, cart_communicator, send_request);
+  MPI_Irecv(recv_buffer, buffer_len, MPI_DOUBLE, neighbour, recv_tag, cart_communicator, recv_request);
 
   STOP_PROFILING(settings.kernel_profile, __func__);
 }
@@ -55,3 +57,20 @@ void barrier() { MPI_Barrier(MPI_COMM_WORLD); }
 
 // End the application
 void abort_comms() { MPI_Abort(MPI_COMM_WORLD, 1); }
+
+// Initialise a cartesian topology, given the x and y dimensions
+void initialise_cart_topology(int x_dimension, int y_dimension, Settings &settings) {
+  int dims[NUM_GRID_DIMENSIONS] = {x_dimension, y_dimension};
+  int periods[NUM_GRID_DIMENSIONS] = {false, false};
+  int reorder = true;
+  MPI_Cart_create(MPI_COMM_WORLD, NUM_GRID_DIMENSIONS, dims, periods, reorder, &cart_communicator);
+
+  MPI_Comm_rank(cart_communicator, &settings.cart_rank);
+
+  settings.cart_coords = (int *)malloc(sizeof(int) * NUM_GRID_DIMENSIONS);
+  MPI_Cart_coords(cart_communicator, settings.cart_rank, NUM_GRID_DIMENSIONS, settings.cart_coords);
+}
+
+void get_cart_neighbours_rank(int axis, int offset, int neighbours_rank[]) {
+  MPI_Cart_shift(cart_communicator, axis, offset, &neighbours_rank[0], &neighbours_rank[1]);
+}

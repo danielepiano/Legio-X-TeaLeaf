@@ -22,4 +22,5 @@ test_problem 5
 profiler_on
 use_c_kernels
 visit_frequency=5
+check_result
 *endtea
