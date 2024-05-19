@@ -1,4 +1,5 @@
 #include "chunk.h"
+#include "comms.h"
 #include "dpl_shim.h"
 #include "ranged.h"
 #include "shared.h"

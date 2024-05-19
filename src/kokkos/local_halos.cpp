@@ -1,4 +1,5 @@
 #include "chunk.h"
+#include "comms.h"
 #include "kokkos_shared.hpp"
 #include "shared.h"
 

@@ -1,4 +1,5 @@
 #include "chunk.h"
+#include "comms.h"
 #include "shared.h"
 #include "sycl_shared.hpp"
 

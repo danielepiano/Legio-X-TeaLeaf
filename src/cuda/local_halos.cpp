@@ -1,4 +1,5 @@
 #include "chunk.h"
+#include "comms.h"
 #include "cuknl_shared.h"
 #include "shared.h"
 
