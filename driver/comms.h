@@ -27,9 +27,8 @@ void initialise_comms(int argc, char **argv);
 void initialise_ranks(Settings &settings);
 void sum_over_ranks(Settings &settings, double *a);
 void min_over_ranks(Settings &settings, double *a);
-void wait_for_requests(Settings &settings, int num_requests, MPI_Request *requests);
 void send_recv_message(Settings &settings, double *send_buffer, double *recv_buffer, int buffer_len, int neighbour, int send_tag,
-                       int recv_tag, MPI_Request *send_request, MPI_Request *recv_request);
+                       int recv_tag);
 
 void initialise_cart_topology(int x_dimension, int y_dimension, Settings &settings);
 void get_cart_neighbours_rank(int axis, int offset, int neighbours_rank[]);

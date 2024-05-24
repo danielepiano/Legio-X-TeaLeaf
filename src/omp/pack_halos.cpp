@@ -180,26 +180,23 @@ void run_send_recv_halo(Chunk *chunk, Settings &settings,                       
                         FieldBufferType src_send_buffer, FieldBufferType src_recv_buffer, //
                         StagingBufferType, StagingBufferType,                             //
                         int buffer_len, int neighbour,                                    //
-                        int send_tag, int recv_tag,                                       //
-                        MPI_Request *send_request, MPI_Request *recv_request) {
+                        int send_tag, int recv_tag) {
   START_PROFILING(settings.kernel_profile);
   // We can't shorten this boolean expression thanks to a bug AOMP: https://github.com/ROCm-Developer-Tools/aomp/issues/601
 #ifdef OMP_TARGET
   if (!settings.is_offload) {
-    send_recv_message(settings, src_send_buffer, src_recv_buffer, buffer_len, neighbour, send_tag, recv_tag, send_request, recv_request);
+    send_recv_message(settings, src_send_buffer, src_recv_buffer, buffer_len, neighbour, send_tag, recv_tag);
   } else {
   #pragma omp target update if (settings.staging_buffer) from(src_send_buffer[ : buffer_len])
   #pragma omp target data if (!settings.staging_buffer) use_device_ptr(src_send_buffer, src_recv_buffer)
-    send_recv_message(settings, src_send_buffer, src_recv_buffer, buffer_len, neighbour, send_tag, recv_tag, send_request, recv_request);
+    send_recv_message(settings, src_send_buffer, src_recv_buffer, buffer_len, neighbour, send_tag, recv_tag);
   }
 #else
-  send_recv_message(settings, src_send_buffer, src_recv_buffer, buffer_len, neighbour, send_tag, recv_tag, send_request, recv_request);
+  send_recv_message(settings, src_send_buffer, src_recv_buffer, buffer_len, neighbour, send_tag, recv_tag);
 #endif
 
   STOP_PROFILING(settings.kernel_profile, __func__);
 }
-
-void run_before_waitall_halo(Chunk *, Settings &) {}
 
 void run_restore_recv_halo(Chunk *, Settings &settings, //
                            FieldBufferType dest_recv_buffer, StagingBufferType, int buffer_len) {

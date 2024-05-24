@@ -125,11 +125,9 @@ void run_pack_or_unpack(Chunk *chunk, Settings &settings, int depth, int face, b
 }
 
 void run_send_recv_halo(Chunk *, Settings &settings, FieldBufferType send_buffer, FieldBufferType recv_buffer, StagingBufferType,
-                        StagingBufferType, int buffer_len, int neighbour, int send_tag, int recv_tag, MPI_Request *send_request,
-                        MPI_Request *recv_request) {
-  send_recv_message(settings, send_buffer, recv_buffer, buffer_len, neighbour, send_tag, recv_tag, send_request, recv_request);
+                        StagingBufferType, int buffer_len, int neighbour, int send_tag, int recv_tag) {
+  send_recv_message(settings, send_buffer, recv_buffer, buffer_len, neighbour, send_tag, recv_tag);
 }
-void run_before_waitall_halo(Chunk *, Settings &) {}
 
 void run_restore_recv_halo(Chunk *, Settings &, FieldBufferType, StagingBufferType, int) {
   // no-op, staging not used

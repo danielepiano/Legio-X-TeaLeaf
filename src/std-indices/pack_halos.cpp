@@ -52,7 +52,8 @@ void unpack_top(const int x, const int y, const int depth, const int halo_depth,
 }
 
 // Unpacks bottom data from buffer.
-void unpack_bottom(const int x, const int y, const int depth, const int halo_depth, double *field, const double *buffer, int buffer_offset) {
+void unpack_bottom(const int x, const int y, const int depth, const int halo_depth, double *field, const double *buffer,
+                   int buffer_offset) {
   ranged<int> it(0, x * depth);
   std::for_each(EXEC_POLICY, it.begin(), it.end(), [=](const int index) {
     const int offset = x * (halo_depth - depth);
@@ -111,13 +112,11 @@ void run_pack_or_unpack(Chunk *chunk, Settings &settings, int depth, int face, b
 }
 
 void run_send_recv_halo(Chunk *, Settings &settings, FieldBufferType src_send_buffer, FieldBufferType src_recv_buffer, StagingBufferType,
-                        StagingBufferType, int buffer_len, int neighbour, int send_tag, int recv_tag, MPI_Request *send_request,
-                        MPI_Request *recv_request) {
+                        StagingBufferType, int buffer_len, int neighbour, int send_tag, int recv_tag) {
   // Host/USM model, no-op for staging buffers here
-  send_recv_message(settings, src_send_buffer, src_recv_buffer, buffer_len, neighbour, send_tag, recv_tag, send_request, recv_request);
+  send_recv_message(settings, src_send_buffer, src_recv_buffer, buffer_len, neighbour, send_tag, recv_tag);
 }
 
-void run_before_waitall_halo(Chunk *, Settings &) {}
 void run_restore_recv_halo(Chunk *, Settings &, FieldBufferType, StagingBufferType, int) {
   // Host/USM model, no-op for staging buffers here
 }

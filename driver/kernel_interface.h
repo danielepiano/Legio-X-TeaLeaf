@@ -28,9 +28,7 @@ void run_send_recv_halo(Chunk *chunk, Settings &settings,                       
                         FieldBufferType src_send_buffer, FieldBufferType src_recv_buffer,                       //
                         StagingBufferType dest_staging_send_buffer, StagingBufferType dest_staging_recv_buffer, //
                         int buffer_len, int neighbour,                                                          //
-                        int send_tag, int recv_tag,                                                             //
-                        MPI_Request *send_request, MPI_Request *recv_request);
-void run_before_waitall_halo(Chunk *chunk, Settings &settings);
+                        int send_tag, int recv_tag);
 void run_restore_recv_halo(Chunk *chunk, Settings &settings, //
                            FieldBufferType dest_recv_buffer, StagingBufferType src_staging_recv_buffer, int buffer_len);
 

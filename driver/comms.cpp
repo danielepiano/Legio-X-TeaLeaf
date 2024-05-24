@@ -1,6 +1,8 @@
 #include "comms.h"
 #include "settings.h"
 
+#include <iostream>
+
 MPI_Comm cart_communicator;
 
 // Initialise MPI
@@ -17,22 +19,13 @@ void finalise_comms() { MPI_Finalize(); }
 
 // Sends a message out and receives a message in
 void send_recv_message(Settings &settings, double *send_buffer, double *recv_buffer, int buffer_len, int neighbour, int send_tag,
-                       int recv_tag, MPI_Request *send_request, MPI_Request *recv_request) {
+                       int recv_tag) {
   START_PROFILING(settings.kernel_profile);
 
-  MPI_Isend(send_buffer, buffer_len, MPI_DOUBLE, neighbour, send_tag, cart_communicator, send_request);
-  MPI_Irecv(recv_buffer, buffer_len, MPI_DOUBLE, neighbour, recv_tag, cart_communicator, recv_request);
+  MPI_Sendrecv(send_buffer, buffer_len, MPI_DOUBLE, neighbour, send_tag, //
+               recv_buffer, buffer_len, MPI_DOUBLE, neighbour, recv_tag, //
+               cart_communicator, MPI_STATUS_IGNORE);
 
-  STOP_PROFILING(settings.kernel_profile, __func__);
-}
-
-// Waits for all requests to complete
-void wait_for_requests(Settings &settings, int num_requests, MPI_Request *requests) {
-  START_PROFILING(settings.kernel_profile);
-  // MPI_Waitall(num_requests, requests, MPI_STATUSES_IGNORE);
-  for (int rr = 0; rr < num_requests; ++rr) {
-    MPI_Wait(&requests[rr], MPI_STATUS_IGNORE);
-  }
   STOP_PROFILING(settings.kernel_profile, __func__);
 }
 

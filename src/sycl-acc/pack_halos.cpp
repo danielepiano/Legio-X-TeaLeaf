@@ -231,8 +231,7 @@ void run_send_recv_halo(Chunk *chunk, Settings &settings,                       
                         FieldBufferType src_send_buffer, FieldBufferType src_recv_buffer, //
                         StagingBufferType, StagingBufferType,                             //
                         int buffer_len, int neighbour,                                    //
-                        int send_tag, int recv_tag,                                       //
-                        MPI_Request *send_request, MPI_Request *recv_request) {
+                        int send_tag, int recv_tag) {
 
 #ifdef USE_HOSTTASK
   if (settings.staging_buffer) {
@@ -243,7 +242,7 @@ void run_send_recv_halo(Chunk *chunk, Settings &settings,                       
         send_recv_message(settings,                     //
                           snd_buffer_acc.get_pointer(), //
                           rcv_buffer_acc.get_pointer(), //
-                          buffer_len, neighbour, send_tag, recv_tag, send_request, recv_request);
+                          buffer_len, neighbour, send_tag, recv_tag);
       });
     });
   } else {
@@ -254,7 +253,7 @@ void run_send_recv_halo(Chunk *chunk, Settings &settings,                       
         send_recv_message(settings,                                    //
                           get_native_ptr_or_throw(ih, snd_buffer_acc), //
                           get_native_ptr_or_throw(ih, rcv_buffer_acc), //
-                          buffer_len, neighbour, send_tag, recv_tag, send_request, recv_request);
+                          buffer_len, neighbour, send_tag, recv_tag);
       });
     });
   }
@@ -264,7 +263,7 @@ void run_send_recv_halo(Chunk *chunk, Settings &settings,                       
     send_recv_message(settings, //
                       host_accessor<double, 1, access_mode::read_write>{*src_send_buffer, buffer_len}.get_pointer(),
                       host_accessor<double, 1, access_mode::read_write>{*src_recv_buffer, buffer_len}.get_pointer(), buffer_len, neighbour,
-                      send_tag, recv_tag, send_request, recv_request);
+                      send_tag, recv_tag);
   } else {
   #if defined(__HIPSYCL__) || defined(__OPENSYCL__)
     //    chunk->ext->device_queue->wait_and_throw();
@@ -287,7 +286,7 @@ void run_send_recv_halo(Chunk *chunk, Settings &settings,                       
     send_recv_message(settings,                        //
                       src_send_buffer->get_pointer(d), //
                       src_recv_buffer->get_pointer(d), //
-                      buffer_len, neighbour, send_tag, recv_tag, send_request, recv_request);
+                      buffer_len, neighbour, send_tag, recv_tag);
   #else
     throw std::logic_error("host_task is disabled and staging is also disabled, this won't work");
   #endif
@@ -295,19 +294,4 @@ void run_send_recv_halo(Chunk *chunk, Settings &settings,                       
 #endif
 }
 
-void run_before_waitall_halo(Chunk *chunk, Settings &settings) {
-#ifdef USE_HOSTTASK
-  chunk->ext->device_queue->wait_and_throw();
-#else
-  if (settings.staging_buffer) {
-    // drop-through to waitall directly
-  } else {
-  #if defined(__HIPSYCL__) || defined(__OPENSYCL__)
-    chunk->ext->device_queue->wait_and_throw();
-  #else
-    throw std::logic_error("host_task is disabled and staging is also disabled, this won't work");
-  #endif
-  }
-#endif
-}
 void run_restore_recv_halo(Chunk *, Settings &, FieldBufferType, StagingBufferType, int) {}

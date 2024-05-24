@@ -146,23 +146,21 @@ void run_send_recv_halo(Chunk *, Settings &settings,                            
                         FieldBufferType src_send_buffer, FieldBufferType src_recv_buffer,                       //
                         StagingBufferType dest_staging_send_buffer, StagingBufferType dest_staging_recv_buffer, //
                         int buffer_len, int neighbour,                                                          //
-                        int send_tag, int recv_tag,                                                             //
-                        MPI_Request *send_request, MPI_Request *recv_request) {
+                        int send_tag, int recv_tag) {
   START_PROFILING(settings.kernel_profile);
   if (settings.staging_buffer) {
     cudaMemcpy(dest_staging_send_buffer, src_send_buffer, buffer_len * sizeof(double), CLOVER_MEMCPY_KIND_D2H);
     cudaMemcpy(dest_staging_recv_buffer, src_recv_buffer, buffer_len * sizeof(double), CLOVER_MEMCPY_KIND_D2H);
     send_recv_message(settings,                                           //
                       dest_staging_send_buffer, dest_staging_recv_buffer, //
-                      buffer_len, neighbour, send_tag, recv_tag, send_request, recv_request);
+                      buffer_len, neighbour, send_tag, recv_tag);
   } else {
     cudaDeviceSynchronize();
-    send_recv_message(settings, src_send_buffer, src_recv_buffer, buffer_len, neighbour, send_tag, recv_tag, send_request, recv_request);
+    send_recv_message(settings, src_send_buffer, src_recv_buffer, buffer_len, neighbour, send_tag, recv_tag);
   }
   STOP_PROFILING(settings.kernel_profile, __func__);
 }
 
-void run_before_waitall_halo(Chunk *, Settings &) {}
 
 void run_restore_recv_halo(Chunk *, Settings &settings, //
                            FieldBufferType dest_recv_buffer, StagingBufferType src_staging_recv_buffer, int buffer_len) {
