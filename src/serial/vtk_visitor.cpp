@@ -76,55 +76,55 @@ void visit_vtk_file(int time_step, Chunk *chunks, Settings &settings) {
   char *filename = (char *)malloc(sizeof(char) * MAX_CHAR_LEN);
   strncpy(filename, settings.tea_vtk_path_name, MAX_CHAR_LEN);
   strcat(filename, calc_x_y_time_step_filename(settings.cart_coords[X_AXIS], settings.cart_coords[Y_AXIS], time_step));
-  std::ofstream tea_chunk_ts(filename, std::ofstream::out);
+  std::ofstream tea_x_y_ts(filename, std::ofstream::out);
 
-  tea_chunk_ts << "# vtk DataFile Version 3.0" << std::endl;
-  tea_chunk_ts << "vtk output" << std::endl;
-  tea_chunk_ts << "ASCII" << std::endl;
-  tea_chunk_ts << "DATASET RECTILINEAR_GRID" << std::endl;
-  tea_chunk_ts << "DIMENSIONS " << dim_x + 1 << " " << dim_y + 1 << " 1" << std::endl;
+  tea_x_y_ts << "# vtk DataFile Version 3.0" << std::endl;
+  tea_x_y_ts << "vtk output" << std::endl;
+  tea_x_y_ts << "ASCII" << std::endl;
+  tea_x_y_ts << "DATASET RECTILINEAR_GRID" << std::endl;
+  tea_x_y_ts << "DIMENSIONS " << dim_x + 1 << " " << dim_y + 1 << " 1" << std::endl;
 
-  tea_chunk_ts << "X_COORDINATES " << dim_x + 1 << " double" << std::endl;
+  tea_x_y_ts << "X_COORDINATES " << dim_x + 1 << " double" << std::endl;
   for (int xx = chunk.left; xx <= chunk.right; ++xx) {
-    tea_chunk_ts << std::scientific << std::setw(12) << std::setprecision(4) << settings.grid_x_min + settings.dx * ((double)xx)
-                 << std::endl;
+    tea_x_y_ts << std::scientific << std::setw(12) << std::setprecision(4) << settings.grid_x_min + settings.dx * ((double)xx) << " ";
   }
+  tea_x_y_ts << std::endl;
 
-  tea_chunk_ts << "Y_COORDINATES " << dim_y + 1 << " double" << std::endl;
+  tea_x_y_ts << "Y_COORDINATES " << dim_y + 1 << " double" << std::endl;
   for (int yy = chunk.bottom; yy <= chunk.top; ++yy) {
-    tea_chunk_ts << std::scientific << std::setw(12) << std::setprecision(4) << settings.grid_y_min + settings.dy * ((double)yy)
-                 << std::endl;
+    tea_x_y_ts << std::scientific << std::setw(12) << std::setprecision(4) << settings.grid_y_min + settings.dy * ((double)yy) << " ";
   }
+  tea_x_y_ts << std::endl;
 
-  tea_chunk_ts << "Z_COORDINATES " << dim_z << " double" << std::endl;
-  tea_chunk_ts << "0" << std::endl;
+  tea_x_y_ts << "Z_COORDINATES " << dim_z << " double" << std::endl;
+  tea_x_y_ts << "0" << std::endl;
 
-  tea_chunk_ts << "CELL_DATA " << dim_x * dim_y << std::endl;
-  tea_chunk_ts << "FIELD FieldData 3" << std::endl;
+  tea_x_y_ts << "CELL_DATA " << dim_x * dim_y << std::endl;
+  tea_x_y_ts << "FIELD FieldData 3" << std::endl;
 
-  tea_chunk_ts << "density 1 " << dim_x * dim_y << " double" << std::endl;
+  tea_x_y_ts << "density 1 " << dim_x * dim_y << " double" << std::endl;
   for (int yy = settings.halo_depth; yy < chunk.y - settings.halo_depth; ++yy) {
     for (int xx = settings.halo_depth; xx < chunk.x - settings.halo_depth; ++xx) {
       int idx = yy * chunk.x + xx;
-      tea_chunk_ts << std::scientific << std::setw(12) << std::setprecision(4) << chunk.density[idx] << std::endl;
+      tea_x_y_ts << std::scientific << std::setw(12) << std::setprecision(4) << chunk.density[idx] << std::endl;
     }
   }
 
-  tea_chunk_ts << "energy 1 " << dim_x * dim_y << " double" << std::endl;
+  tea_x_y_ts << "energy 1 " << dim_x * dim_y << " double" << std::endl;
   for (int yy = settings.halo_depth; yy < chunk.y - settings.halo_depth; ++yy) {
     for (int xx = settings.halo_depth; xx < chunk.x - settings.halo_depth; ++xx) {
       int idx = yy * chunk.x + xx;
-      tea_chunk_ts << std::scientific << std::setw(12) << std::setprecision(4) << chunk.energy0[idx] << std::endl;
+      tea_x_y_ts << std::scientific << std::setw(12) << std::setprecision(4) << chunk.energy0[idx] << std::endl;
     }
   }
 
-  tea_chunk_ts << "temperature 1 " << dim_x * dim_y << " double" << std::endl;
+  tea_x_y_ts << "temperature 1 " << dim_x * dim_y << " double" << std::endl;
   for (int yy = settings.halo_depth; yy < chunk.y - settings.halo_depth; ++yy) {
     for (int xx = settings.halo_depth; xx < chunk.x - settings.halo_depth; ++xx) {
       int idx = yy * chunk.x + xx;
-      tea_chunk_ts << std::scientific << std::setw(12) << std::setprecision(4) << chunk.u[idx] << std::endl;
+      tea_x_y_ts << std::scientific << std::setw(12) << std::setprecision(4) << chunk.u[idx] << std::endl;
     }
   }
 
-  tea_chunk_ts.close();
+  tea_x_y_ts.close();
 }
