@@ -1,9 +1,6 @@
 #include "vtk_visitor.h"
 #include "comms.h"
-#include <cstring>
 #include <fstream>
-#include <iomanip>
-#include <iostream>
 #include <sstream>
 
 #define MAX_CHAR_LEN 256
@@ -11,10 +8,11 @@
 void track_all_vtk_files(int time_step, Settings &settings);
 void visit_vtk_file(int time_step, Chunk *chunks, Settings &settings);
 
-char *calc_rank_time_step_filename(int rank, int time_step) {
+char *calc_x_y_time_step_filename(int x, int y, int time_step) {
   char *filename = (char *)malloc(sizeof(char) * MAX_CHAR_LEN);
   std::ostringstream dynamic_filename;
-  dynamic_filename << "tea." << std::setfill('0') << std::setw(5) << rank + 1;
+  dynamic_filename << "tea." << std::setfill('0') << std::setw(5) << x;
+  dynamic_filename << "." << std::setfill('0') << std::setw(5) << y;
   dynamic_filename << "." << std::setfill('0') << std::setw(5) << time_step;
   dynamic_filename << ".vtk";
   strncpy(filename, dynamic_filename.str().c_str(), MAX_CHAR_LEN);
@@ -57,8 +55,10 @@ void track_all_vtk_files(int time_step, Settings &settings) {
   strcat(filename, settings.tea_visit_filename);
   std::ofstream tea_visit(filename, std::ofstream::app);
 
-  for (int rr = 0; rr < settings.num_ranks; ++rr) {
-    tea_visit << calc_rank_time_step_filename(rr, time_step) << std::endl;
+  for (int yy = 0; yy < settings.grid_y_chunks; ++yy) {
+    for (int xx = 0; xx < settings.grid_x_chunks; ++xx) {
+      tea_visit << calc_x_y_time_step_filename(xx, yy, time_step) << std::endl;
+    }
   }
   tea_visit.close();
 }
@@ -72,7 +72,7 @@ void visit_vtk_file(int time_step, Chunk *chunks, Settings &settings) {
 
   char *filename = (char *)malloc(sizeof(char) * MAX_CHAR_LEN);
   strncpy(filename, settings.tea_vtk_path_name, MAX_CHAR_LEN);
-  strcat(filename, calc_rank_time_step_filename(settings.rank, time_step));
+  strcat(filename, calc_x_y_time_step_filename(settings.cart_coords[X_AXIS], settings.cart_coords[Y_AXIS], time_step));
   std::ofstream tea_chunk_ts(filename, std::ofstream::out);
 
   tea_chunk_ts << "# vtk DataFile Version 3.0" << std::endl;
