@@ -199,13 +199,7 @@ def write_vtk_file(iter, destination, vtk_out, binary_format=False):
     print(f">> VTK file printed for iter. no. {iter} as {destination}.")
 
 
-def main(input_dir, output_dir, binary_format, tea_visit_filename, grid_x_chunks, grid_y_chunks):
-    print(f"-- Input directory:\t{input_dir}")
-    print(f"-- Output directory:\t{output_dir}")
-    print(f"-- Visit info filename:\t{tea_visit_filename}")
-    print(f"-- Num. X chunks:\t{grid_x_chunks}")
-    print(f"-- Num. Y chunks:\t{grid_y_chunks}")
-
+def main(input_dir, output_dir, binary_format, grid_x_chunks, grid_y_chunks):
     # Get list of VTK files in the input directory
     vtk_filenames = glob.glob(f"{input_dir}/*.vtk")
     if not vtk_filenames:
@@ -235,30 +229,30 @@ if __name__ == "__main__":
     parser.add_argument(
         "-i",
         "--input",
-        help="The directory containing the input VTK files.",
+        help="the directory containing the input VTK files",
         default="target/vtk",
     )
     parser.add_argument(
         "-o",
         "--output",
-        help="The directory for the merged VTK files.",
+        help="the directory to produce the merged VTK files in",
         default="target/vtk/postprocess"
     )
     parser.add_argument(
         "-v",
         "--visit",
-        help="The path and name of the 'tea.visit' file.",
-        default="target/vtk/tea.visit"
+        help="the directory containing the 'tea.visit' file",
+        default="target/vtk"
     )
     parser.add_argument(
         "--bin",
-        help="Whether the VTK files should be generated in a binary format.",
+        help="whether the VTK files should be generated in a binary format",
         type=bool,
         default=False
     )
     parser.add_argument(
         "--rm",
-        help="Whether to remove the VTK files in the input directory.",
+        help="whether to remove the VTK files in the input directory after postprocessing",
         type=bool,
         default=False
     )
@@ -267,22 +261,29 @@ if __name__ == "__main__":
     if not os.path.exists(args.input):
         print(f">> '{args.input}' path does not exist.")
     if not os.path.exists(args.output):
-        print(f">> One or more directories in '{args.output}' do not exist.")
+        print(f"!! One or more directories in '{args.output}' do not exist.")
         os.makedirs(args.output, exist_ok=True)
         print(f">> Missing directories in '{args.output}' created.")
-    if not os.path.isfile(args.visit):
-        print(f">> '{args.visit}' file does not exist.")
+    tea_visit_filename = os.path.join(args.visit, 'tea.visit')
+    if not os.path.isfile(tea_visit_filename):
+        print(f">> '{tea_visit_filename}' file does not exist.")
         exit(1)
 
     visit_vars = {}
-    with open(args.visit, 'r') as tea_visit:
+    with open(tea_visit_filename, 'r') as tea_visit:
         for line in tea_visit:
             data = line.strip().split()
             if len(data) == 2:
                 visit_vars[data[0]] = int(data[1])
 
-    main(args.input, args.output, args.bin, args.visit, int(visit_vars["grid_x_chunks"]),
-         int(visit_vars["grid_y_chunks"]))
+    print(f"-- Input directory:\t{args.input}")
+    print(f"-- Output directory:\t{args.output}")
+    print(f"-- Tea.visit:\t\t{tea_visit_filename}")
+    print(f"-- Num. Y chunks:\t{visit_vars['grid_y_chunks']}")
+    print(f"-- Num. X chunks:\t{visit_vars['grid_x_chunks']}")
+    print(f"-- Binary format:\t{args.bin}")
+    print(f"-- Remove VTK files after postprocessing:\t{args.rm}")
+    main(args.input, args.output, args.bin, int(visit_vars["grid_x_chunks"]), int(visit_vars["grid_y_chunks"]))
 
     if args.rm:
         vtk_filenames = glob.glob(f"{args.input}/*.vtk")
