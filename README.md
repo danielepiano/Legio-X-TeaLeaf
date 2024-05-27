@@ -3,8 +3,7 @@
 Project for **_Advanced Computer Architectures_** course @ **Politecnico di Milano**.
 
 [**_TeaLeaf_**](https://github.com/UoB-HPC/TeaLeaf) heat conduction <u>mini-app</u> over
-[**_Legio_**](https://github.com/Robyroc/Legio) MPI fault-tolerance
-library.
+[**_Legio_**](https://github.com/Robyroc/Legio) MPI fault-tolerance library.
 
 The objective is to perform a performance and functionality analysis in scenarios where the MPI infrastructure is
 affected by failures.
@@ -146,6 +145,50 @@ New properties added by _TeaLeaf_ w.r.t. to _TeaLeaf_ref_ are
 
 Following properties have been implemented in this fork.
 
-| OPTION                | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                           |
-|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `visit_frequency <I>` | Step frequency of visualisation dumps. The files produced are text base VTK files and are easily viewed on apps such as _ViSit_, _Paraview_, etc.. The default is to output no graphical data. The default is to output no graphical data.<br/>Note that the overhead of output is high, so should not be invoked when performance benchmarking is being carried out. |
+| OPTION                | DESCRIPTION                                                                                                                                                                                                                                                                                                              |
+|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `visit_frequency <I>` | Step frequency of visualisation dumps. The files produced are text base VTK files and are easily viewed on apps such as _ViSit_, _ParaView_, etc.. The default is to output no graphical data.<br/>Note that the visit overhead is high, so it should not be invoked when performance benchmarking is being carried out. |
+
+## _Legio-X-TeaLeaf_ postprocessing
+
+Just like _TeaLeaf_ref_, this application has been improved to make each node produce its own VTK file - _Visualization
+ToolKit_ format. Each VTK file can be opened and visualized in applications such as _ViSit_ and _ParaView_.
+
+To improve VTK files management on these applications, a postprocessing script is supplied to merge VTK files produced
+by different nodes but related to the same iteration.
+
+### Prerequisites
+
+* Python >= 3
+* PIP >= 24.0
+
+### Steps
+
+```shell
+# UNA TANTUM :: Install required packages
+foo@bar:~/path/to/Legio-X-TeaLeaf$ pip3 install -r postprocess-requirements.txt
+
+# Postprocess
+foo@bar:~/path/to/Legio-X-TeaLeaf$ python3 postprocess.py [-options]
+```
+
+Following, the options to run the script.
+
+| OPTION                                  | DEFAULT                | DESCRIPTION                                                                  |
+|-----------------------------------------|------------------------|------------------------------------------------------------------------------|
+| `-i <string>` </br> `--input <string>`  | target/vtk             | The directory containing the input VTK files.                                |
+| `-o <string>` </br> `--output <string>` | target/vtk/postprocess | The directory to produce the merged VTK files in.                            |
+| `-v <string>` </br> `--visit <string>`  | target/vtk             | The directory containing the 'tea.visit' file.                               |
+| `--bin <bool>`                          | false                  | Whether the VTK files should be generated in a binary format.                |
+| `--rm <bool>`                           | false                  | Whether to remove the VTK files in the input directory after postprocessing. |
+
+## Utilities
+
+### Shortcut to delete all VTK files in default paths
+
+Useful if you want to run another execution with either different `end_step` or `visit_frequency`.
+
+```shell
+# Remove all target/**/*.vtk files
+foo@bar:~/path/to/Legio-X-TeaLeaf$ ./clear-vtk.sh
+```
