@@ -78,7 +78,7 @@ void visit_vtk_file(int time_step, Chunk *chunks, Settings &settings) {
   strcat(filename, calc_x_y_time_step_filename(settings.cart_coords[X_AXIS], settings.cart_coords[Y_AXIS], time_step));
   std::ofstream tea_x_y_ts(filename, std::ofstream::out);
 
-  tea_x_y_ts << "# vtk DataFile Version 3.0" << std::endl;
+  tea_x_y_ts << "# vtk DataFile Version 5.1" << std::endl;
   tea_x_y_ts << "vtk output" << std::endl;
   tea_x_y_ts << "ASCII" << std::endl;
   tea_x_y_ts << "DATASET RECTILINEAR_GRID" << std::endl;
