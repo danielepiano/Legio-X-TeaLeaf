@@ -28,10 +28,8 @@ void init(Settings &settings) {
   strcat(filename, settings.tea_visit_filename);
 
   std::ofstream tea_visit(filename, std::ofstream::out);
-  tea_visit << "num_chunks " << settings.num_chunks << std::endl;
   tea_visit << "grid_y_chunks " << settings.grid_y_chunks << std::endl;
   tea_visit << "grid_x_chunks " << settings.grid_x_chunks << std::endl;
-  tea_visit << "visit_frequency " << settings.visit_frequency << std::endl;
   tea_visit.close();
 }
 
