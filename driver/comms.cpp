@@ -26,8 +26,9 @@ void send_recv_message(Settings &settings, double *send_buffer, double *recv_buf
   for (int ii = 0; ii < buffer_len; ++ii) {
     switch (settings.recv_ft_strategy) {
       case RecvFaultToleranceStrategy::STATIC: recv_buffer[ii] = 0.00; break;
-      case RecvFaultToleranceStrategy::MIRROR: recv_buffer[ii] = send_buffer[ii] break;
-      default: break;
+      case RecvFaultToleranceStrategy::MIRROR: recv_buffer[ii] = send_buffer[ii]; break;
+      default:
+        break;
       // todo case RecvFaultToleranceStrategy::BRIDGE: recv_buffer[ii] = 0.00; break;
       // todo case RecvFaultToleranceStrategy::INTERPOLATION: recv_buffer[ii] = 0.00; break;
     }
