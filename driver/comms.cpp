@@ -22,25 +22,34 @@ void finalise_comms() { MPI_Finalize(); }
 void send_recv_message(Settings &settings, double *send_buffer, double *recv_buffer, int buffer_len, int neighbour, int send_tag,
                        int recv_tag) {
   START_PROFILING(settings.kernel_profile);
-  if(settings.rank < neighbour)
-  {
-    MPI_Send(send_buffer, buffer_len, MPI_DOUBLE, neighbour, send_tag, cart_communicator);
-    MPI_Recv(recv_buffer, buffer_len, MPI_DOUBLE, neighbour, recv_tag, cart_communicator, MPI_STATUS_IGNORE);
-  }
-  else
-  {
-    MPI_Recv(recv_buffer, buffer_len, MPI_DOUBLE, neighbour, recv_tag, cart_communicator, MPI_STATUS_IGNORE);
-    MPI_Send(send_buffer, buffer_len, MPI_DOUBLE, neighbour, send_tag, cart_communicator);
-  }
-  //void* data = malloc(sizeof(double)*buffer_len);
-  //memcpy(data, send_buffer, sizeof(double)*buffer_len);
-  //MPI_Sendrecv_replace(data, 1, MPI_DOUBLE, neighbour, send_tag, neighbour, recv_tag, cart_communicator, MPI_STATUS_IGNORE);
-  //memcpy(recv_buffer, data, sizeof(double)*buffer_len);
-  //free(data);
 
-  //MPI_Sendrecv(send_buffer, 0, MPI_DOUBLE, neighbour, send_tag, //
-  //             recv_buffer, 0, MPI_DOUBLE, neighbour, recv_tag, //
-  //             cart_communicator, MPI_STATUS_IGNORE);
+  for (int ii = 0; ii < buffer_len; ++ii) {
+    switch (settings.recv_ft_strategy) {
+      case RecvFaultToleranceStrategy::STATIC: recv_buffer[ii] = 0.00; break;
+      case RecvFaultToleranceStrategy::MIRROR: recv_buffer[ii] = send_buffer[ii] break;
+      default: break;
+      // todo case RecvFaultToleranceStrategy::BRIDGE: recv_buffer[ii] = 0.00; break;
+      // todo case RecvFaultToleranceStrategy::INTERPOLATION: recv_buffer[ii] = 0.00; break;
+    }
+  }
+
+  if (settings.rank < neighbour) {
+    MPI_Send(send_buffer, buffer_len, MPI_DOUBLE, neighbour, send_tag, cart_communicator);
+    MPI_Recv(recv_buffer, buffer_len, MPI_DOUBLE, neighbour, recv_tag, cart_communicator, MPI_STATUS_IGNORE);
+  } else {
+    MPI_Recv(recv_buffer, buffer_len, MPI_DOUBLE, neighbour, recv_tag, cart_communicator, MPI_STATUS_IGNORE);
+    MPI_Send(send_buffer, buffer_len, MPI_DOUBLE, neighbour, send_tag, cart_communicator);
+  }
+
+  // void* data = malloc(sizeof(double)*buffer_len);
+  // memcpy(data, send_buffer, sizeof(double)*buffer_len);
+  // MPI_Sendrecv_replace(data, 1, MPI_DOUBLE, neighbour, send_tag, neighbour, recv_tag, cart_communicator, MPI_STATUS_IGNORE);
+  // memcpy(recv_buffer, data, sizeof(double)*buffer_len);
+  // free(data);
+
+  // MPI_Sendrecv(send_buffer, 0, MPI_DOUBLE, neighbour, send_tag, //
+  //              recv_buffer, 0, MPI_DOUBLE, neighbour, recv_tag, //
+  //              cart_communicator, MPI_STATUS_IGNORE);
 
   STOP_PROFILING(settings.kernel_profile, __func__);
 }

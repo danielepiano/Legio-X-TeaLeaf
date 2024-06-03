@@ -5,8 +5,6 @@
 
 #include <iostream>
 
-#include <signal.h>
-
 // Attempts to pack buffers
 int invoke_pack_or_unpack(Chunk *chunk, Settings &settings, int face, int depth, int offset, bool pack, FieldBufferType buffer) {
   int buffer_len = 0;
@@ -49,8 +47,6 @@ int invoke_pack_or_unpack(Chunk *chunk, Settings &settings, int face, int depth,
 void remote_halo_driver(Chunk *chunks, Settings &settings, int depth) {
 #ifndef NO_MPI
   int neighbours_rank[NUM_DIRECTION_NEIGHBOURS];
-
-  // if (settings.rank == 2) raise(SIGKILL);
 
   // Pack lr buffers and send messages
   get_cart_neighbours_rank(X_AXIS, 1, neighbours_rank);

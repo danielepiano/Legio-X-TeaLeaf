@@ -17,7 +17,7 @@ y_cells=128
 halo_depth=2
 
 initial_timestep=0.004
-end_step=1000
+end_step=30
 
 max_iters=10000
 use_cg

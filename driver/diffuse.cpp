@@ -3,6 +3,8 @@
 #include "drivers.h"
 #include "vtk_visitor.h"
 
+#include <signal.h>
+
 double calc_dt(Chunk *chunks);
 void calc_min_timestep(Chunk *chunks, double *dt, int chunks_per_task);
 void solve(Chunk *chunks, Settings &settings, int tt, double *wallclock_prev);
@@ -15,6 +17,9 @@ bool diffuse(Chunk *chunks, Settings &settings) {
   if (settings.visit_frequency) visit(tt, chunks, settings);
 
   for (tt = 1; tt <= settings.end_step; ++tt) {
+    // Inject failure at given step on given rank
+    // if (settings.rank == 2 && tt == 3) raise(SIGKILL);
+
     solve(chunks, settings, tt, &wallclock_prev);
   }
 

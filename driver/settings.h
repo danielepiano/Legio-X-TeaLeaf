@@ -12,6 +12,7 @@
 #define DEF_TEST_PROBLEM_FILENAME "tea.problems"
 #define DEF_TEA_VISIT_FILENAME "tea.visit"
 #define DEF_TEA_VTK_PATHNAME "target/vtk/"
+#define DEF_RECV_FT_STRATEGY RecvFaultToleranceStrategy::MIRROR
 #define DEF_GRID_X_MIN 0.0
 #define DEF_GRID_Y_MIN 0.0
 #define DEF_GRID_Z_MIN 0.0
@@ -55,6 +56,8 @@ enum class Kernel_Language { C, FORTRAN };
 enum class StagingBuffer { ENABLE, DISABLE, AUTO };
 
 enum class ModelKind { Host, Offload, Unified };
+
+enum class RecvFaultToleranceStrategy { STATIC, MIRROR, BRIDGE, INTERPOLATION };
 
 // The main settings structure
 struct Settings {
@@ -103,6 +106,9 @@ struct Settings {
   int visit_frequency;
   char *tea_visit_filename;
   char *tea_vtk_path_name;
+
+  // Fault-tolerance recovery strategy on receive
+  RecvFaultToleranceStrategy recv_ft_strategy;
 
   Solver solver;
   char *solver_name;
