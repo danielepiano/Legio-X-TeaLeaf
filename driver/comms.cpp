@@ -23,23 +23,31 @@ void send_recv_message(Settings &settings, double *send_buffer, double *recv_buf
                        int recv_tag) {
   START_PROFILING(settings.kernel_profile);
 
-  for (int ii = 0; ii < buffer_len; ++ii) {
-    switch (settings.recv_ft_strategy) {
-      case RecvFaultToleranceStrategy::STATIC: recv_buffer[ii] = 0.00; break;
-      case RecvFaultToleranceStrategy::MIRROR: recv_buffer[ii] = send_buffer[ii]; break;
-      default:
-        break;
-      // todo case RecvFaultToleranceStrategy::BRIDGE: recv_buffer[ii] = 0.00; break;
-      // todo case RecvFaultToleranceStrategy::INTERPOLATION: recv_buffer[ii] = 0.00; break;
-    }
-  }
-
+  int rc;
   if (settings.rank < neighbour) {
     MPI_Send(send_buffer, buffer_len, MPI_DOUBLE, neighbour, send_tag, cart_communicator);
-    MPI_Recv(recv_buffer, buffer_len, MPI_DOUBLE, neighbour, recv_tag, cart_communicator, MPI_STATUS_IGNORE);
+    rc = MPI_Recv(recv_buffer, buffer_len, MPI_DOUBLE, neighbour, recv_tag, cart_communicator, MPI_STATUS_IGNORE);
   } else {
-    MPI_Recv(recv_buffer, buffer_len, MPI_DOUBLE, neighbour, recv_tag, cart_communicator, MPI_STATUS_IGNORE);
+    rc = MPI_Recv(recv_buffer, buffer_len, MPI_DOUBLE, neighbour, recv_tag, cart_communicator, MPI_STATUS_IGNORE);
     MPI_Send(send_buffer, buffer_len, MPI_DOUBLE, neighbour, send_tag, cart_communicator);
+  }
+
+  if (rc == MPIX_ERR_PROC_FAILED) {
+    for (int ii = 0; ii < buffer_len; ++ii) {
+      switch (settings.recv_ft_strategy) {
+        case RecvFaultToleranceStrategy::STATIC: {
+          recv_buffer[ii] = DEF_RECV_FT_STATIC_VALUE;
+          break;
+        }
+        case RecvFaultToleranceStrategy::MIRROR: {
+          recv_buffer[ii] = send_buffer[ii];
+          break;
+        }
+        // todo case RecvFaultToleranceStrategy::BRIDGE: recv_buffer[ii] = 0.00; break;
+        // todo case RecvFaultToleranceStrategy::INTERPOLATION: recv_buffer[ii] = 0.00; break;
+        default: break;
+      }
+    }
   }
 
   // void* data = malloc(sizeof(double)*buffer_len);

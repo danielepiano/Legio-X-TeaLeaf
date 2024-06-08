@@ -144,19 +144,19 @@ void read_settings(FILE *tea_in, Settings &settings) {
       continue;
     }
     // fault tolerance on receive
-    if (starts_with("use_static_ft_strategy", line)) {
+    if (starts_with("use_static_recv_ft_strategy", line)) {
       settings.recv_ft_strategy = RecvFaultToleranceStrategy::STATIC;
       continue;
     }
-    if (starts_with("use_mirror_ft_strategy", line)) {
+    if (starts_with("use_mirror_recv_ft_strategy", line)) {
       settings.recv_ft_strategy = RecvFaultToleranceStrategy::MIRROR;
       continue;
     }
-    if (starts_with("use_bridge_ft_strategy", line)) {
+    if (starts_with("use_bridge_recv_ft_strategy", line)) {
       settings.recv_ft_strategy = RecvFaultToleranceStrategy::BRIDGE;
       continue;
     }
-    if (starts_with("use_interpolation_ft_strategy", line)) {
+    if (starts_with("use_interpolation_recv_ft_strategy", line)) {
       settings.recv_ft_strategy = RecvFaultToleranceStrategy::INTERPOLATION;
       continue;
     }

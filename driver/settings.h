@@ -13,6 +13,7 @@
 #define DEF_TEA_VISIT_FILENAME "tea.visit"
 #define DEF_TEA_VTK_PATHNAME "target/vtk/"
 #define DEF_RECV_FT_STRATEGY RecvFaultToleranceStrategy::MIRROR
+#define DEF_RECV_FT_STATIC_VALUE 0.001
 #define DEF_GRID_X_MIN 0.0
 #define DEF_GRID_Y_MIN 0.0
 #define DEF_GRID_Z_MIN 0.0

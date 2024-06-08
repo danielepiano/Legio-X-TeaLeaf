@@ -25,6 +25,9 @@ eps=1.0e-15
 
 visit_frequency=10
 
+#use_static_recv_ft_strategy
+use_mirror_recv_ft_strategy
+
 #check_result
 
 *endtea
