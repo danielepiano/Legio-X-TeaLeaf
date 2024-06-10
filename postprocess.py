@@ -135,8 +135,6 @@ def merge_cell_data(num_y_chunks, vtk_iter_files_info):
                     energy.append(vtk_info["vtk"].GetCellData().GetArray(1).GetValue(idx))
                     temperature.append(vtk_info["vtk"].GetCellData().GetArray(2).GetValue(idx))
 
-    vtk_cell_data = vtk.vtkCellData().NewInstance()
-
     vtk_density = vtk.vtkDoubleArray().NewInstance()
     vtk_density.SetName("density")
     for de in density:
@@ -266,6 +264,7 @@ if __name__ == "__main__":
 
     if not os.path.exists(args.input):
         print(f">> '{args.input}' path does not exist.")
+        exit(1)
     if not os.path.exists(args.output):
         print(f"!! One or more directories in '{args.output}' do not exist.")
         os.makedirs(args.output, exist_ok=True)
