@@ -145,7 +145,7 @@ void run_pack_or_unpack(Chunk *chunk, Settings &settings, int depth, int face, b
 void run_send_recv_halo(Chunk *, Settings &settings,                                                            //
                         FieldBufferType src_send_buffer, FieldBufferType src_recv_buffer,                       //
                         StagingBufferType dest_staging_send_buffer, StagingBufferType dest_staging_recv_buffer, //
-                        int buffer_len, int neighbour,                                                          //
+                        int buffer_len, int neighbour,                                                     //
                         int send_tag, int recv_tag) {
   START_PROFILING(settings.kernel_profile);
   if (settings.staging_buffer) {
@@ -160,7 +160,6 @@ void run_send_recv_halo(Chunk *, Settings &settings,                            
   }
   STOP_PROFILING(settings.kernel_profile, __func__);
 }
-
 
 void run_restore_recv_halo(Chunk *, Settings &settings, //
                            FieldBufferType dest_recv_buffer, StagingBufferType src_staging_recv_buffer, int buffer_len) {

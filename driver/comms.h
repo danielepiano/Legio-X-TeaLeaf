@@ -15,10 +15,9 @@
 #include "settings.h"
 
 #define NUM_GRID_DIMENSIONS 2
-#define NUM_DIRECTION_NEIGHBOURS 2
+#define NUM_NEIGHBOURS 4
 enum CART_AXIS { X_AXIS, Y_AXIS };
-enum X_DIRECTIONS { LEFT, RIGHT };
-enum Y_DIRECTIONS { DOWN, UP };
+enum CART_NEIGHBOUR { LEFT, RIGHT, DOWN, UP };
 
 void barrier();
 void abort_comms();
@@ -27,8 +26,9 @@ void initialise_comms(int argc, char **argv);
 void initialise_ranks(Settings &settings);
 void sum_over_ranks(Settings &settings, double *a);
 void min_over_ranks(Settings &settings, double *a);
-void send_recv_message(Settings &settings, double *send_buffer, double *recv_buffer, int buffer_len, int neighbour, int send_tag,
-                       int recv_tag);
+void send_recv_message(Settings &settings, double *send_buffer, double *recv_buffer, int buffer_len,
+                       int neighbour_rank, int send_tag, int recv_tag);
 
 void initialise_cart_topology(int x_dimension, int y_dimension, Settings &settings);
-void get_cart_neighbours_rank(int axis, int offset, int neighbours_rank[]);
+void get_cart_neighbours_rank(int offset, int neighbours_rank[]);
+void get_cart_coords(int cart_rank, int cart_coords[]);

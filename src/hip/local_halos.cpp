@@ -55,9 +55,9 @@ __global__ void update_right(const int x, const int y, const int halo_depth, con
 
 // Updates faces in turn.
 void update_face(const int x, const int y, const int halo_depth, const int depth, double *buffer) {
-  int neighbours_rank[NUM_DIRECTION_NEIGHBOURS];
+  int neighbours_rank[NUM_NEIGHBOURS];
+  get_cart_neighbours_rank(1, neighbours_rank);
 
-  get_cart_neighbours_rank(Y_AXIS, 1, neighbours_rank);
   int num_blocks = std::ceil((x * depth) / (double)BLOCK_SIZE);
   if (neighbours_rank[UP] == MPI_PROC_NULL) {
     update_top<<<num_blocks, BLOCK_SIZE>>>(x, y, halo_depth, depth, buffer);
@@ -68,7 +68,6 @@ void update_face(const int x, const int y, const int halo_depth, const int depth
     check_errors(__LINE__, __FILE__);
   }
 
-  get_cart_neighbours_rank(X_AXIS, 1, neighbours_rank);
   num_blocks = std::ceil((y * depth) / (float)BLOCK_SIZE);
   if (neighbours_rank[RIGHT] == MPI_PROC_NULL) {
     update_right<<<num_blocks, BLOCK_SIZE>>>(x, y, halo_depth, depth, buffer);
