@@ -174,13 +174,14 @@ foo@bar:~/path/to/Legio-X-TeaLeaf$ python3 postprocess.py [-options]
 
 Following, the options to run the script.
 
-| OPTION                                  | DEFAULT                | DESCRIPTION                                                                  |
-|-----------------------------------------|------------------------|------------------------------------------------------------------------------|
-| `-i <string>` </br> `--input <string>`  | target/vtk             | The directory containing the input VTK files.                                |
-| `-o <string>` </br> `--output <string>` | target/vtk/postprocess | The directory to produce the merged VTK files in.                            |
-| `-v <string>` </br> `--visit <string>`  | target/vtk             | The directory containing the 'tea.visit' file.                               |
-| `--bin <bool>`                          | false                  | Whether the VTK files should be generated in a binary format.                |
-| `--rm <bool>`                           | false                  | Whether to remove the VTK files in the input directory after postprocessing. |
+| OPTION                                         | DEFAULT                | DESCRIPTION                                                                              |
+|------------------------------------------------|------------------------|------------------------------------------------------------------------------------------|
+| `-i <string>` </br> `--input <string>`         | target/vtk             | The directory containing the input VTK files.                                            |
+| `-o <string>` </br> `--output <string>`        | target/vtk/postprocess | The directory to produce the merged VTK files in.                                        |
+| `-p <string>` </br> `--output-prefix <string>` | tea                    | The prefix to introduce to output VTK filenames for `<prefix>.<x>.<y>.<iteratino> naming. |
+| `-v <string>` </br> `--visit <string>`         | target/vtk             | The directory containing the 'tea.visit' file.    `                                       |
+| `--bin <bool>`                                 | false                  | Whether the VTK files should be generated in a bin`ary format.                            |
+| `--rm <bool>`                                  | false                  | Whether to remove the VTK files in the input directory after postprocessing.             |
 
 ## Utilities
 
