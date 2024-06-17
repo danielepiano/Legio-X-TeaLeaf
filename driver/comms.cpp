@@ -7,6 +7,33 @@
 
 MPI_Comm cart_communicator;
 
+void recover(enum RecvFaultToleranceStrategy recv_ft_strategy, double *send_buffer, double *recv_buffer, int buffer_len) {
+  switch (recv_ft_strategy) {
+    case RecvFaultToleranceStrategy::STATIC: {
+      for (int ii = 0; ii < buffer_len; ++ii) {
+        recv_buffer[ii] = DEF_RECV_FT_STATIC_VALUE;
+      }
+      break;
+    }
+    case RecvFaultToleranceStrategy::MIRROR: {
+      for (int ii = 0; ii < buffer_len; ++ii) {
+        recv_buffer[ii] = send_buffer[ii];
+      }
+      break;
+    }
+    case RecvFaultToleranceStrategy::BRIDGE:
+    case RecvFaultToleranceStrategy::INTERPOLATION: {
+      MPIX_Comm_failure_ack(cart_communicator);
+      // Apply MIRROR strategy the first time a fault is detected
+      for (int ii = 0; ii < buffer_len; ++ii) {
+        recv_buffer[ii] = send_buffer[ii];
+      }
+      break;
+    }
+    default: break;
+  }
+}
+
 // Initialise MPI
 void initialise_comms(int argc, char **argv) { MPI_Init(&argc, &argv); }
 
@@ -33,32 +60,7 @@ void send_recv_message(Settings &settings, double *send_buffer, double *recv_buf
     MPI_Send(send_buffer, buffer_len, MPI_DOUBLE, neighbour_rank, send_tag, cart_communicator);
   }
 
-  if (rc == MPIX_ERR_PROC_FAILED) {
-    switch (settings.recv_ft_strategy) {
-      case RecvFaultToleranceStrategy::STATIC: {
-        for (int ii = 0; ii < buffer_len; ++ii) {
-          recv_buffer[ii] = DEF_RECV_FT_STATIC_VALUE;
-        }
-        break;
-      }
-      case RecvFaultToleranceStrategy::MIRROR: {
-        for (int ii = 0; ii < buffer_len; ++ii) {
-          recv_buffer[ii] = send_buffer[ii];
-        }
-        break;
-      }
-      case RecvFaultToleranceStrategy::BRIDGE:
-      case RecvFaultToleranceStrategy::INTERPOLATION: {
-        MPIX_Comm_failure_ack(cart_communicator);
-        // Apply MIRROR strategy the first time a fault is detected
-        for (int ii = 0; ii < buffer_len; ++ii) {
-          recv_buffer[ii] = send_buffer[ii];
-        }
-        break;
-      }
-      default: break;
-    }
-  }
+  if (rc == MPIX_ERR_PROC_FAILED) recover(settings.recv_ft_strategy, send_buffer, recv_buffer, buffer_len);
 
   STOP_PROFILING(settings.kernel_profile, __func__);
 }
