@@ -18,7 +18,8 @@ bool diffuse(Chunk *chunks, Settings &settings) {
 
   for (tt = 1; tt <= settings.end_step; ++tt) {
     // Inject failure at given step on given rank
-    if (settings.cart_coords[X_AXIS] == 3 && settings.cart_coords[Y_AXIS] == 0 && tt == 31) raise(SIGKILL);
+    // if (settings.cart_coords[X_AXIS] == 3 && settings.cart_coords[Y_AXIS] == 0 && tt == 31) raise(SIGKILL);
+    // if (settings.cart_coords[X_AXIS] == 1 && settings.cart_coords[Y_AXIS] == 1 && tt == 41) raise(SIGKILL);
 
     solve(chunks, settings, tt, &wallclock_prev);
   }

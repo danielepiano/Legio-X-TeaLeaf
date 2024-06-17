@@ -2,6 +2,7 @@
 #include "settings.h"
 
 #include <iostream>
+#include <mpi-ext.h>
 #include <string.h>
 
 MPI_Comm cart_communicator;
@@ -19,8 +20,8 @@ void initialise_ranks(Settings &settings) {
 void finalise_comms() { MPI_Finalize(); }
 
 // Sends a message out and receives a message in
-void send_recv_message(Settings &settings, double *send_buffer, double *recv_buffer, int buffer_len,
-                       int neighbour_rank, int send_tag, int recv_tag) {
+void send_recv_message(Settings &settings, double *send_buffer, double *recv_buffer, int buffer_len, int neighbour_rank, int send_tag,
+                       int recv_tag) {
   START_PROFILING(settings.kernel_profile);
 
   int rc;
@@ -33,30 +34,31 @@ void send_recv_message(Settings &settings, double *send_buffer, double *recv_buf
   }
 
   if (rc == MPIX_ERR_PROC_FAILED) {
-    for (int ii = 0; ii < buffer_len; ++ii) {
-      switch (settings.recv_ft_strategy) {
-        case RecvFaultToleranceStrategy::STATIC: {
+    switch (settings.recv_ft_strategy) {
+      case RecvFaultToleranceStrategy::STATIC: {
+        for (int ii = 0; ii < buffer_len; ++ii) {
           recv_buffer[ii] = DEF_RECV_FT_STATIC_VALUE;
-          break;
         }
-        case RecvFaultToleranceStrategy::MIRROR: {
-          recv_buffer[ii] = send_buffer[ii];
-          break;
-        }
-        default: break;
+        break;
       }
+      case RecvFaultToleranceStrategy::MIRROR: {
+        for (int ii = 0; ii < buffer_len; ++ii) {
+          recv_buffer[ii] = send_buffer[ii];
+        }
+        break;
+      }
+      case RecvFaultToleranceStrategy::BRIDGE:
+      case RecvFaultToleranceStrategy::INTERPOLATION: {
+        MPIX_Comm_failure_ack(cart_communicator);
+        // Apply MIRROR strategy the first time a fault is detected
+        for (int ii = 0; ii < buffer_len; ++ii) {
+          recv_buffer[ii] = send_buffer[ii];
+        }
+        break;
+      }
+      default: break;
     }
   }
-
-  // void* data = malloc(sizeof(double)*buffer_len);
-  // memcpy(data, send_buffer, sizeof(double)*buffer_len);
-  // MPI_Sendrecv_replace(data, 1, MPI_DOUBLE, neighbour, send_tag, neighbour, recv_tag, cart_communicator, MPI_STATUS_IGNORE);
-  // memcpy(recv_buffer, data, sizeof(double)*buffer_len);
-  // free(data);
-
-  // MPI_Sendrecv(send_buffer, 0, MPI_DOUBLE, neighbour, send_tag, //
-  //              recv_buffer, 0, MPI_DOUBLE, neighbour, recv_tag, //
-  //              cart_communicator, MPI_STATUS_IGNORE);
 
   STOP_PROFILING(settings.kernel_profile, __func__);
 }
@@ -87,7 +89,7 @@ void abort_comms() { MPI_Abort(MPI_COMM_WORLD, 1); }
 void initialise_cart_topology(int x_dimension, int y_dimension, Settings &settings) {
   int dims[NUM_GRID_DIMENSIONS] = {x_dimension, y_dimension};
   int periods[NUM_GRID_DIMENSIONS] = {false, false};
-  int reorder = true;
+  int reorder = false;
   MPI_Cart_create(MPI_COMM_WORLD, NUM_GRID_DIMENSIONS, dims, periods, reorder, &cart_communicator);
 
   MPI_Comm_rank(cart_communicator, &settings.cart_rank);
@@ -96,9 +98,9 @@ void initialise_cart_topology(int x_dimension, int y_dimension, Settings &settin
   get_cart_coords(settings.cart_rank, settings.cart_coords);
 }
 
-void get_cart_neighbours_rank(int offset, int neighbours_rank[]) {
-  MPI_Cart_shift(cart_communicator, X_AXIS, offset, &neighbours_rank[LEFT], &neighbours_rank[RIGHT]);
-  MPI_Cart_shift(cart_communicator, Y_AXIS, offset, &neighbours_rank[DOWN], &neighbours_rank[UP]);
+void get_cart_neighbour_ranks(int offset, int neighbour_ranks[]) {
+  MPI_Cart_shift(cart_communicator, X_AXIS, offset, &neighbour_ranks[LEFT], &neighbour_ranks[RIGHT]);
+  MPI_Cart_shift(cart_communicator, Y_AXIS, offset, &neighbour_ranks[DOWN], &neighbour_ranks[UP]);
 }
 
 void get_cart_coords(int cart_rank, int cart_coords[]) { MPI_Cart_coords(cart_communicator, cart_rank, NUM_GRID_DIMENSIONS, cart_coords); }

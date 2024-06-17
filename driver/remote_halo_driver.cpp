@@ -104,13 +104,13 @@ void interpolation_recovery(Chunk *chunk, Settings &settings,                   
           }
         }
         // Replace interpolated values
-        for (int ii = 0; ii < height * 2; ++ii) {
+        for (int ii = 0; ii < width * 2; ++ii) {
           recv_buffer[buffer_offset + ii] = approx[ii];
         }
         // Free temp array 'approx'
         delete[] approx;
         // Go on with the next field to interpolate
-        buffer_offset += height * 2;
+        buffer_offset += width * 2;
       }
       break;
     }
@@ -134,13 +134,13 @@ void interpolation_recovery(Chunk *chunk, Settings &settings,                   
           }
         }
         // Replace interpolated values
-        for (int ii = 0; ii < height * 2; ++ii) {
+        for (int ii = 0; ii < width * 2; ++ii) {
           recv_buffer[buffer_offset + ii] = approx[ii];
         }
         // Free temp array 'approx'
         delete[] approx;
         // Go on with the next field to interpolate
-        buffer_offset += height * 2;
+        buffer_offset += width * 2;
       }
       break;
     }
@@ -189,7 +189,7 @@ int invoke_pack_or_unpack(Chunk *chunk, Settings &settings, int face, int depth,
 void remote_halo_driver(Chunk *chunks, Settings &settings, int depth) {
 #ifndef NO_MPI
   int neighbour_ranks[NUM_NEIGHBOURS], neighbour_offset = 1;
-  get_cart_neighbours_rank(neighbour_offset, neighbour_ranks);
+  get_cart_neighbour_ranks(neighbour_offset, neighbour_ranks);
 
   // Pack lr buffers and send messages
   if (neighbour_ranks[LEFT] != MPI_PROC_NULL) {
@@ -242,7 +242,9 @@ void remote_halo_driver(Chunk *chunks, Settings &settings, int depth) {
                        chunks[0].bottom_send, chunks[0].bottom_recv,                             //
                        chunks[0].staging_bottom_send, chunks[0].staging_bottom_recv, buffer_len, //
                        neighbour_ranks[DOWN], 0, 1);
-    interpolation_recovery(&chunks[0], settings, chunks[0].bottom_send, chunks[0].bottom_recv, neighbour_ranks[DOWN], DOWN);
+    if (settings.recv_ft_strategy == RecvFaultToleranceStrategy::INTERPOLATION) {
+      interpolation_recovery(&chunks[0], settings, chunks[0].bottom_send, chunks[0].bottom_recv, neighbour_ranks[DOWN], DOWN);
+    }
   }
   if (neighbour_ranks[UP] != MPI_PROC_NULL) {
     int buffer_len = invoke_pack_or_unpack(&(chunks[0]), settings, CHUNK_TOP, depth, chunks[0].x, true, chunks[0].top_send);
@@ -250,7 +252,9 @@ void remote_halo_driver(Chunk *chunks, Settings &settings, int depth) {
                        chunks[0].top_send, chunks[0].top_recv,                             //
                        chunks[0].staging_top_send, chunks[0].staging_top_recv, buffer_len, //
                        neighbour_ranks[UP], 1, 0);
-    interpolation_recovery(&chunks[0], settings, chunks[0].top_send, chunks[0].top_recv, neighbour_ranks[UP], UP);
+    if (settings.recv_ft_strategy == RecvFaultToleranceStrategy::INTERPOLATION) {
+      interpolation_recovery(&chunks[0], settings, chunks[0].top_send, chunks[0].top_recv, neighbour_ranks[UP], UP);
+    }
   }
 
   buffer_len = 0;

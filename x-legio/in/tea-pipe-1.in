@@ -27,7 +27,8 @@ visit_frequency=10
 
 #use_static_recv_ft_strategy
 #use_mirror_recv_ft_strategy
-use_interpolation_recv_ft_strategy
+use_bridge_recv_ft_strategy
+#use_interpolation_recv_ft_strategy
 
 #check_result
 

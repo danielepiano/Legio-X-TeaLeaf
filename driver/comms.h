@@ -30,5 +30,5 @@ void send_recv_message(Settings &settings, double *send_buffer, double *recv_buf
                        int neighbour_rank, int send_tag, int recv_tag);
 
 void initialise_cart_topology(int x_dimension, int y_dimension, Settings &settings);
-void get_cart_neighbours_rank(int offset, int neighbours_rank[]);
+void get_cart_neighbour_ranks(int offset, int neighbours_rank[]);
 void get_cart_coords(int cart_rank, int cart_coords[]);
