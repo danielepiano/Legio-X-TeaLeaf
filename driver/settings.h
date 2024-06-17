@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shared.h"
+#include "fault_manager.h"
 #include <cstdint>
 #include <string>
 
@@ -57,8 +58,6 @@ enum class Kernel_Language { C, FORTRAN };
 enum class StagingBuffer { ENABLE, DISABLE, AUTO };
 
 enum class ModelKind { Host, Offload, Unified };
-
-enum class RecvFaultToleranceStrategy { STATIC, MIRROR, BRIDGE, INTERPOLATION };
 
 // The main settings structure
 struct Settings {
