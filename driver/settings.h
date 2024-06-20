@@ -15,6 +15,7 @@
 #define DEF_TEA_VTK_PATHNAME "target/vtk/"
 #define DEF_RECV_FT_STRATEGY RecvFaultToleranceStrategy::MIRROR
 #define DEF_RECV_FT_STATIC_VALUE 0.00001
+#define DEF_RECV_FT_INTERPOLATION_FACTOR 0.001
 #define DEF_GRID_X_MIN 0.0
 #define DEF_GRID_Y_MIN 0.0
 #define DEF_GRID_Z_MIN 0.0
@@ -109,6 +110,8 @@ struct Settings {
 
   // Fault-tolerance recovery strategy on receive
   RecvFaultToleranceStrategy recv_ft_strategy;
+  double recv_ft_static_value;
+  double recv_ft_interpolation_factor;
 
   Solver solver;
   char *solver_name;

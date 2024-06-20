@@ -144,22 +144,24 @@ void read_settings(FILE *tea_in, Settings &settings) {
       continue;
     }
     // fault tolerance on receive
-    if (starts_with("use_static_recv_ft_strategy", line)) {
+    if (starts_with("use_recv_ft_static_strategy", line)) {
       settings.recv_ft_strategy = RecvFaultToleranceStrategy::STATIC;
       continue;
     }
-    if (starts_with("use_mirror_recv_ft_strategy", line)) {
+    if (starts_get_double("with_recv_ft_static_value", line, word, &settings.recv_ft_static_value)) continue;
+    if (starts_with("use_recv_ft_mirror_strategy", line)) {
       settings.recv_ft_strategy = RecvFaultToleranceStrategy::MIRROR;
       continue;
     }
-    if (starts_with("use_bridge_recv_ft_strategy", line)) {
+    if (starts_with("use_recv_ft_bridge_strategy", line)) {
       settings.recv_ft_strategy = RecvFaultToleranceStrategy::BRIDGE;
       continue;
     }
-    if (starts_with("use_interpolation_recv_ft_strategy", line)) {
+    if (starts_with("use_recv_ft_interpolation_strategy", line)) {
       settings.recv_ft_strategy = RecvFaultToleranceStrategy::INTERPOLATION;
       continue;
     }
+    if (starts_get_double("with_recv_ft_interpolation_factor", line, word, &settings.recv_ft_interpolation_factor)) continue;
   }
 
   // Set the cell widths now

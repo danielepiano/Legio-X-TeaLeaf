@@ -25,10 +25,12 @@ eps=1.0e-15
 
 visit_frequency=10
 
-#use_static_recv_ft_strategy
-#use_mirror_recv_ft_strategy
-use_bridge_recv_ft_strategy
-#use_interpolation_recv_ft_strategy
+#use_recv_ft_static_strategy
+with_recv_ft_static_value 0.00001
+#use_recv_ft_mirror_strategy
+#use_recv_ft_bridge_strategy
+use_recv_ft_interpolation_strategy
+#with_recv_ft_interpolation_factor 0.0001
 
 #check_result
 
