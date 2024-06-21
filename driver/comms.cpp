@@ -1,9 +1,6 @@
 #include "comms.h"
-#include "settings.h"
 #include "fault_manager.h"
-
-#include <iostream>
-#include <string.h>
+#include "settings.h"
 
 MPI_Comm cart_communicator;
 
@@ -33,9 +30,9 @@ void send_recv_message(Settings &settings, double *send_buffer, double *recv_buf
     MPI_Send(send_buffer, buffer_len, MPI_DOUBLE, neighbour_rank, send_tag, cart_communicator);
   }
 
-  if (rc == MPIX_ERR_PROC_FAILED) {
-    recover(cart_communicator, settings.recv_ft_strategy, send_buffer, recv_buffer, buffer_len);
-  }
+  recover_on_fault(cart_communicator, settings.cart_rank, neighbour_rank, rc,                                       //
+                   settings.recv_ft_strategy, settings.recv_ft_static_value, settings.recv_ft_interpolation_factor, //
+                   send_buffer, recv_buffer, buffer_len);
 
   STOP_PROFILING(settings.kernel_profile, __func__);
 }
