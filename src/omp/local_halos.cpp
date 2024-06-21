@@ -67,9 +67,9 @@ void update_bottom(const int x, const int y, const int halo_depth, const int dep
 
 // Updates faces in turn.
 void update_face(const int x, const int y, const int halo_depth, const int depth, double *buffer, bool is_offload) {
-  int neighbours_rank[NUM_DIRECTION_NEIGHBOURS];
+  int neighbours_rank[NUM_NEIGHBOURS];
+  get_cart_neighbour_ranks(1, neighbours_rank);
 
-  get_cart_neighbours_rank(X_AXIS, 1, neighbours_rank);
   if (neighbours_rank[LEFT] == MPI_PROC_NULL) {
     update_left(x, y, halo_depth, depth, buffer, is_offload);
   }
@@ -77,7 +77,6 @@ void update_face(const int x, const int y, const int halo_depth, const int depth
     update_right(x, y, halo_depth, depth, buffer, is_offload);
   }
 
-  get_cart_neighbours_rank(Y_AXIS, 1, neighbours_rank);
   if (neighbours_rank[UP] == MPI_PROC_NULL) {
     update_top(x, y, halo_depth, depth, buffer, is_offload);
   }

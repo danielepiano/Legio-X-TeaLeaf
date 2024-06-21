@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shared.h"
+#include "fault_manager.h"
 #include <cstdint>
 #include <string>
 
@@ -12,6 +13,9 @@
 #define DEF_TEST_PROBLEM_FILENAME "tea.problems"
 #define DEF_TEA_VISIT_FILENAME "tea.visit"
 #define DEF_TEA_VTK_PATHNAME "target/vtk/"
+#define DEF_RECV_FT_STRATEGY RecvFaultToleranceStrategy::INTERPOLATION
+#define DEF_RECV_FT_STATIC_VALUE 0.00001
+#define DEF_RECV_FT_INTERPOLATION_FACTOR 0.001
 #define DEF_GRID_X_MIN 0.0
 #define DEF_GRID_Y_MIN 0.0
 #define DEF_GRID_Z_MIN 0.0
@@ -103,6 +107,11 @@ struct Settings {
   int visit_frequency;
   char *tea_visit_filename;
   char *tea_vtk_path_name;
+
+  // Fault-tolerance recovery strategy on receive
+  RecvFaultToleranceStrategy recv_ft_strategy;
+  double recv_ft_static_value;
+  double recv_ft_interpolation_factor;
 
   Solver solver;
   char *solver_name;

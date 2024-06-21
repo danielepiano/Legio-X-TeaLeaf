@@ -48,6 +48,7 @@ void read_config(Settings &settings, State **states) {
   print_to_log(settings, "\tnum_chunks_per_rank = %d\n", settings.num_chunks_per_rank);
   print_to_log(settings, "\tsummary_frequency = %d\n", settings.summary_frequency);
   print_to_log(settings, "\tvisit_frequency = %d\n", settings.visit_frequency);
+  print_to_log(settings, "\trecv_ft_strategy = %d\n", settings.recv_ft_strategy);
 
   for (int ss = 0; ss < settings.num_states; ++ss) {
     print_to_log(settings, "\t\nstate %d\n", ss);
@@ -142,6 +143,25 @@ void read_settings(FILE *tea_in, Settings &settings) {
       settings.coefficient = RECIP_CONDUCTIVITY;
       continue;
     }
+    // fault tolerance on receive
+    if (starts_with("use_recv_ft_static_strategy", line)) {
+      settings.recv_ft_strategy = RecvFaultToleranceStrategy::STATIC;
+      continue;
+    }
+    if (starts_get_double("with_recv_ft_static_value", line, word, &settings.recv_ft_static_value)) continue;
+    if (starts_with("use_recv_ft_mirror_strategy", line)) {
+      settings.recv_ft_strategy = RecvFaultToleranceStrategy::MIRROR;
+      continue;
+    }
+    if (starts_with("use_recv_ft_bridge_strategy", line)) {
+      settings.recv_ft_strategy = RecvFaultToleranceStrategy::BRIDGE;
+      continue;
+    }
+    if (starts_with("use_recv_ft_interpolation_strategy", line)) {
+      settings.recv_ft_strategy = RecvFaultToleranceStrategy::INTERPOLATION;
+      continue;
+    }
+    if (starts_get_double("with_recv_ft_interpolation_factor", line, word, &settings.recv_ft_interpolation_factor)) continue;
   }
 
   // Set the cell widths now

@@ -186,8 +186,7 @@ void run_send_recv_halo(Chunk *chunk, Settings &settings,                       
                         FieldBufferType src_send_buffer, FieldBufferType src_recv_buffer, //
                         StagingBufferType, StagingBufferType,                             //
                         int buffer_len, int neighbour,                                    //
-                        int send_tag, int recv_tag,                                       //
-                        MPI_Request *send_request, MPI_Request *recv_request) {
+                        int send_tag, int recv_tag) {
 
 #ifdef USE_HOSTTASK
   chunk->ext->device_queue->submit([&](sycl::handler &h) {
@@ -195,7 +194,7 @@ void run_send_recv_halo(Chunk *chunk, Settings &settings,                       
       send_recv_message(settings,        //
                         src_send_buffer, //
                         src_recv_buffer, //
-                        buffer_len, neighbour, send_tag, recv_tag, send_request, recv_request);
+                        buffer_len, neighbour, send_tag, recv_tag);
     });
   });
 #else
@@ -203,9 +202,8 @@ void run_send_recv_halo(Chunk *chunk, Settings &settings,                       
   send_recv_message(settings,        //
                     src_send_buffer, //
                     src_recv_buffer, //
-                    buffer_len, neighbour, send_tag, recv_tag, send_request, recv_request);
+                    buffer_len, neighbour, send_tag, recv_tag);
 #endif
 }
 
-void run_before_waitall_halo(Chunk *chunk, Settings &) { chunk->ext->device_queue->wait_and_throw(); }
 void run_restore_recv_halo(Chunk *, Settings &, FieldBufferType, StagingBufferType, int) {}

@@ -135,8 +135,6 @@ def merge_cell_data(num_y_chunks, vtk_iter_files_info):
                     energy.append(vtk_info["vtk"].GetCellData().GetArray(1).GetValue(idx))
                     temperature.append(vtk_info["vtk"].GetCellData().GetArray(2).GetValue(idx))
 
-    vtk_cell_data = vtk.vtkCellData().NewInstance()
-
     vtk_density = vtk.vtkDoubleArray().NewInstance()
     vtk_density.SetName("density")
     for de in density:
@@ -199,7 +197,7 @@ def write_vtk_file(iter, destination, vtk_out, binary_format=False):
     print(f">> VTK file printed for iter. no. {iter} as {destination}.")
 
 
-def main(input_dir, output_dir, binary_format, grid_x_chunks, grid_y_chunks):
+def main(input_dir, output_dir, output_prefix,  binary_format, grid_y_chunks):
     # Get list of VTK files in the input directory
     vtk_filenames = glob.glob(f"{input_dir}/*.vtk")
     if not vtk_filenames:
@@ -214,7 +212,7 @@ def main(input_dir, output_dir, binary_format, grid_x_chunks, grid_y_chunks):
 
     for iter in vtk_files_info:
         vtk_out = merge_vtk_file(iter, grid_y_chunks, vtk_files_info[iter])
-        output_filename = "tea." + str(iter).zfill(5) + ".vtk"
+        output_filename = output_prefix + "." + str(iter).zfill(5) + ".vtk"
         os.path.join(output_dir, output_filename)
         write_vtk_file(iter, os.path.join(output_dir, output_filename), vtk_out, binary_format)
 
@@ -239,6 +237,12 @@ if __name__ == "__main__":
         default="target/vtk/postprocess"
     )
     parser.add_argument(
+        "-p",
+        "--output-prefix",
+        help="the prefix to introduce to output VTK filenames",
+        default="tea"
+    )
+    parser.add_argument(
         "-v",
         "--visit",
         help="the directory containing the 'tea.visit' file",
@@ -260,6 +264,7 @@ if __name__ == "__main__":
 
     if not os.path.exists(args.input):
         print(f">> '{args.input}' path does not exist.")
+        exit(1)
     if not os.path.exists(args.output):
         print(f"!! One or more directories in '{args.output}' do not exist.")
         os.makedirs(args.output, exist_ok=True)
@@ -283,7 +288,7 @@ if __name__ == "__main__":
     print(f"-- Num. X chunks:\t{visit_vars['grid_x_chunks']}")
     print(f"-- Binary format:\t{args.bin}")
     print(f"-- Remove VTK files after postprocessing:\t{args.rm}")
-    main(args.input, args.output, args.bin, int(visit_vars["grid_x_chunks"]), int(visit_vars["grid_y_chunks"]))
+    main(args.input, args.output, args.output_prefix, args.bin, int(visit_vars["grid_y_chunks"]))
 
     if args.rm:
         vtk_filenames = glob.glob(f"{args.input}/*.vtk")

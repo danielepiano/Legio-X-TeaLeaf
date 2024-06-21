@@ -20,12 +20,13 @@ src.*
 tags
 *.vtk
 tea.visit
+x-legio/results/
 
 # CMake
 cmake-build-*/
 Build/
 build/
-build_*/
+build*/
 .idea/
 
 # IntelliJ

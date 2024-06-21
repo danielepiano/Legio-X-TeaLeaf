@@ -111,8 +111,7 @@ void run_send_recv_halo(Chunk *chunk, Settings &settings,                       
                         FieldBufferType src_send_buffer, FieldBufferType src_recv_buffer,                       //
                         StagingBufferType dest_staging_send_buffer, StagingBufferType dest_staging_recv_buffer, //
                         int buffer_len, int neighbour,                                                          //
-                        int send_tag, int recv_tag,                                                             //
-                        MPI_Request *send_request, MPI_Request *recv_request) {
+                        int send_tag, int recv_tag) {
 
   *dest_staging_send_buffer = Kokkos::create_mirror_view(*src_send_buffer);
   *dest_staging_recv_buffer = Kokkos::create_mirror_view(*src_recv_buffer);
@@ -124,10 +123,8 @@ void run_send_recv_halo(Chunk *chunk, Settings &settings,                       
   send_recv_message(settings, //
                     settings.staging_buffer ? dest_staging_send_buffer->data() : src_send_buffer->data(),
                     settings.staging_buffer ? dest_staging_recv_buffer->data() : src_recv_buffer->data(), buffer_len, neighbour, send_tag,
-                    recv_tag, send_request, recv_request);
+                    recv_tag);
 }
-
-void run_before_waitall_halo(Chunk *, Settings &) {}
 
 void run_restore_recv_halo(Chunk *, Settings &settings, //
                            FieldBufferType dest_recv_buffer, StagingBufferType src_staging_recv_buffer, int buffer_len) {

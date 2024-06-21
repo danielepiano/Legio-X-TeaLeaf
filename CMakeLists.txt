@@ -294,6 +294,7 @@ message(STATUS "${RESULT}")
 list(APPEND IMPL_SOURCES
         driver/main.cpp
         driver/comms.cpp
+        driver/fault_manager.cpp
         driver/chunk.cpp
         driver/shared.cpp
         driver/diffuse.cpp

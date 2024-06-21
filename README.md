@@ -112,7 +112,7 @@ There is not a full implementation of the configuration properties of the _TeaLe
 | `x_cells <I>`<br/>`y_cells <I>`                                                           | Number of discrete cells through which decompose the computational domain along the two axis. The default is 10 cells in each direction.                                                                                                                                                                                                            |
 | `state 1 density <R> energy <R>`                                                          | State of the ambient material of the computational domain - here geometry information is ignored. Regions not covered by other defined states receive the energy and density of state 1.                                                                                                                                                            |
 | `state <I> density <R> energy <R> geometry rectangle xmin <R> ymin <R> xmax <R> ymax <R>` | State of a rectangular region in the computational domain.<br/>Note that the generator is simple and the defined state <u>completely</u> fills a cell with which it intersects.<br/>In case of over lapping regions, the last state takes priority.                                                                                                 |
-| `state <I> density <R> energy <R> geometry circle xmin <R> ymin <R> radius <R>`           | State of a circular region in the computational domain.<br/>Note that the generator is simple and the defined state <u>completely</u> fills a cell with which it intersects.<br/>In case of over lapping regions, the last state takes priority.<br/>Hence, a circular region will have a stepped interface.                                        |
+| `state <I> density <R> energy <R> geometry circular xmin <R> ymin <R> radius <R>`         | State of a circular region in the computational domain.<br/>Note that the generator is simple and the defined state <u>completely</u> fills a cell with which it intersects.<br/>In case of over lapping regions, the last state takes priority.<br/>Hence, a circular region will have a stepped interface.                                        |
 | `state <I> density <R> energy <R> geometry point xmin <R> ymin <R>`                       | State of a point in the computational domain.<br/>Note that the generator is simple and the defined state <u>completely</u> fills a cell with which it intersects.<br/>In case of over lapping regions, the last state takes priority.<br/>Hence, a point region will fill the cell it lies in.                                                     |
 | `visit_frequency <I>`                                                                     | Step frequency of visualisation dumps. The files produced are text base VTK files and are easily viewed on apps such as _ViSit_. The default is to output no graphical data. The default is to output no graphical data.<br/>Note that the overhead of output is high, so should not be invoked when performance benchmarking is being carried out. |
 | `summary_frequency <I>`                                                                   | Step frequency of summary dumps. This requires a global reduction and associated synchronisation, so performance will be slightly affected as the frequency is increased. The default is for a summary dump to be produced every 10 steps and at the end of the simulation.                                                                         |
@@ -174,13 +174,14 @@ foo@bar:~/path/to/Legio-X-TeaLeaf$ python3 postprocess.py [-options]
 
 Following, the options to run the script.
 
-| OPTION                                  | DEFAULT                | DESCRIPTION                                                                  |
-|-----------------------------------------|------------------------|------------------------------------------------------------------------------|
-| `-i <string>` </br> `--input <string>`  | target/vtk             | The directory containing the input VTK files.                                |
-| `-o <string>` </br> `--output <string>` | target/vtk/postprocess | The directory to produce the merged VTK files in.                            |
-| `-v <string>` </br> `--visit <string>`  | target/vtk             | The directory containing the 'tea.visit' file.                               |
-| `--bin <bool>`                          | false                  | Whether the VTK files should be generated in a binary format.                |
-| `--rm <bool>`                           | false                  | Whether to remove the VTK files in the input directory after postprocessing. |
+| OPTION                                         | DEFAULT                | DESCRIPTION                                                                              |
+|------------------------------------------------|------------------------|------------------------------------------------------------------------------------------|
+| `-i <string>` </br> `--input <string>`         | target/vtk             | The directory containing the input VTK files.                                            |
+| `-o <string>` </br> `--output <string>`        | target/vtk/postprocess | The directory to produce the merged VTK files in.                                        |
+| `-p <string>` </br> `--output-prefix <string>` | tea                    | The prefix to introduce to output VTK filenames for `<prefix>.<x>.<y>.<iteratino> naming. |
+| `-v <string>` </br> `--visit <string>`         | target/vtk             | The directory containing the 'tea.visit' file.    `                                       |
+| `--bin <bool>`                                 | false                  | Whether the VTK files should be generated in a bin`ary format.                            |
+| `--rm <bool>`                                  | false                  | Whether to remove the VTK files in the input directory after postprocessing.             |
 
 ## Utilities
 
