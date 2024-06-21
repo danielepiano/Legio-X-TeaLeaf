@@ -188,12 +188,6 @@ if __name__ == "__main__":
         required=True
     )
     parser.add_argument(
-        "-o",
-        "--output",
-        help="the directory to produce the error VTK files in",
-        required=True
-    )
-    parser.add_argument(
         "-p",
         "--output-prefix",
         help="the prefix to introduce to output VTK filenames",
@@ -213,10 +207,10 @@ if __name__ == "__main__":
     if not os.path.exists(args.actual):
         print(f">> '{args.actual}' path does not exist.")
         exit(1)
+    args.output = args.actual + "/error"
     if not os.path.exists(args.output):
-        print(f"!! One or more directories in '{args.output}' do not exist.")
         os.makedirs(args.output, exist_ok=True)
-        print(f">> Missing directories in '{args.output}' created.")
+        print(f">> '{args.output}' directory created.")
 
     print(f"-- Expected values' files directory:\t{args.expected}")
     print(f"-- Actual values' files directory:\t{args.actual}")
