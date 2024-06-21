@@ -23,7 +23,7 @@ bool diffuse(Chunk *chunks, Settings &settings) {
     //if (settings.cart_coords[X_AXIS] == 3 && settings.cart_coords[Y_AXIS] == 0 && tt == 31) raise(SIGKILL);
 
     // tea-pipe-1 kill
-    if (settings.cart_coords[X_AXIS] == 1 && settings.cart_coords[Y_AXIS] == 1 && tt == 41) raise(SIGKILL);
+    // if (settings.cart_coords[X_AXIS] == 1 && settings.cart_coords[Y_AXIS] == 1 && tt == 41) raise(SIGKILL);
 
     solve(chunks, settings, tt, &wallclock_prev);
   }
