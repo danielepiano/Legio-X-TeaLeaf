@@ -26,7 +26,7 @@ x-legio/results/
 cmake-build-*/
 Build/
 build/
-build_*/
+build*/
 .idea/
 
 # IntelliJ
