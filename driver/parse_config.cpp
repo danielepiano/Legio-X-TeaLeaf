@@ -1,4 +1,5 @@
 #include "application.h"
+#include "shared.h"
 #include <cctype>
 #include <cstdio>
 #include <cstring>
@@ -143,7 +144,14 @@ void read_settings(FILE *tea_in, Settings &settings) {
       settings.coefficient = RECIP_CONDUCTIVITY;
       continue;
     }
-    // fault tolerance on receive
+    // Fault-tolerance config
+    if (starts_with("use_ft", line)) {
+      settings.ft = true;
+      continue;
+    }
+    if (starts_get_int("with_ft_kill_x", line, word, &settings.with_ft_kill_x)) continue;
+    if (starts_get_int("with_ft_kill_y", line, word, &settings.with_ft_kill_y)) continue;
+    if (starts_get_int("with_ft_kill_iter", line, word, &settings.with_ft_kill_iter)) continue;
     if (starts_with("use_recv_ft_static_strategy", line)) {
       settings.recv_ft_strategy = RecvFaultToleranceStrategy::STATIC;
       continue;
@@ -162,6 +170,7 @@ void read_settings(FILE *tea_in, Settings &settings) {
       continue;
     }
     if (starts_get_double("with_recv_ft_interpolation_factor", line, word, &settings.recv_ft_interpolation_factor)) continue;
+    // Test fault-tolerance
   }
 
   // Set the cell widths now

@@ -57,6 +57,10 @@ void set_default_settings(Settings &settings) {
   settings.solver_name = (char *)malloc(sizeof(char) * MAX_CHAR_LEN);
   settings.device_selector = nullptr;
 
+  settings.ft = DEF_FT;
+  settings.with_ft_kill_x = DEF_WITH_FT_KILL_X;
+  settings.with_ft_kill_y = DEF_WITH_FT_KILL_Y;
+  settings.with_ft_kill_iter = DEF_WITH_FT_KILL_ITER;
   settings.recv_ft_strategy = DEF_RECV_FT_STRATEGY;
   settings.recv_ft_static_value = DEF_RECV_FT_STATIC_VALUE;
   settings.recv_ft_interpolation_factor = DEF_RECV_FT_INTERPOLATION_FACTOR;

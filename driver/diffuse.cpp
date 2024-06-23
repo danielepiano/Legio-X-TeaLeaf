@@ -17,13 +17,12 @@ bool diffuse(Chunk *chunks, Settings &settings) {
   if (settings.visit_frequency) visit(tt, chunks, settings);
 
   for (tt = 1; tt <= settings.end_step; ++tt) {
-    // Inject failure at given step on given rank
-
-    // room-1 kill
-    //if (settings.cart_coords[X_AXIS] == 3 && settings.cart_coords[Y_AXIS] == 0 && tt == 31) raise(SIGKILL);
-
-    // tea-pipe-1 kill
-    // if (settings.cart_coords[X_AXIS] == 1 && settings.cart_coords[Y_AXIS] == 1 && tt == 41) raise(SIGKILL);
+    // Inject failure at given step on given coords
+    if (settings.ft                                                                                                       //
+        && settings.cart_coords[X_AXIS] == settings.with_ft_kill_x && settings.cart_coords[Y_AXIS] == settings.with_ft_kill_y //
+        && tt == settings.with_ft_kill_iter) {
+      raise(SIGKILL);
+    }
 
     solve(chunks, settings, tt, &wallclock_prev);
   }

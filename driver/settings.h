@@ -1,7 +1,7 @@
 #pragma once
 
-#include "shared.h"
 #include "fault_manager.h"
+#include "shared.h"
 #include <cstdint>
 #include <string>
 
@@ -13,6 +13,10 @@
 #define DEF_TEST_PROBLEM_FILENAME "tea.problems"
 #define DEF_TEA_VISIT_FILENAME "tea.visit"
 #define DEF_TEA_VTK_PATHNAME "target/vtk/"
+#define DEF_FT false
+#define DEF_WITH_FT_KILL_X 0
+#define DEF_WITH_FT_KILL_Y 0
+#define DEF_WITH_FT_KILL_ITER 0
 #define DEF_RECV_FT_STRATEGY RecvFaultToleranceStrategy::INTERPOLATION
 #define DEF_RECV_FT_STATIC_VALUE 0.00001
 #define DEF_RECV_FT_INTERPOLATION_FACTOR 0.001
@@ -108,7 +112,11 @@ struct Settings {
   char *tea_visit_filename;
   char *tea_vtk_path_name;
 
-  // Fault-tolerance recovery strategy on receive
+  // Fault-tolerance config
+  bool ft;
+  int with_ft_kill_x;
+  int with_ft_kill_y;
+  int with_ft_kill_iter;
   RecvFaultToleranceStrategy recv_ft_strategy;
   double recv_ft_static_value;
   double recv_ft_interpolation_factor;

@@ -30,9 +30,11 @@ void send_recv_message(Settings &settings, double *send_buffer, double *recv_buf
     MPI_Send(send_buffer, buffer_len, MPI_DOUBLE, neighbour_rank, send_tag, cart_communicator);
   }
 
-  recover_on_fault(cart_communicator, settings.cart_rank, neighbour_rank, rc,                                       //
-                   settings.recv_ft_strategy, settings.recv_ft_static_value, settings.recv_ft_interpolation_factor, //
-                   send_buffer, recv_buffer, buffer_len);
+  if (settings.ft) {
+    recover_on_fault(cart_communicator, settings.cart_rank, neighbour_rank, rc,                                       //
+                     settings.recv_ft_strategy, settings.recv_ft_static_value, settings.recv_ft_interpolation_factor, //
+                     send_buffer, recv_buffer, buffer_len);
+  }
 
   STOP_PROFILING(settings.kernel_profile, __func__);
 }
