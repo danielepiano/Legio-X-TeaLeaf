@@ -61,9 +61,9 @@ void set_default_settings(Settings &settings) {
   settings.with_ft_kill_x = DEF_WITH_FT_KILL_X;
   settings.with_ft_kill_y = DEF_WITH_FT_KILL_Y;
   settings.with_ft_kill_iter = DEF_WITH_FT_KILL_ITER;
-  settings.recv_ft_strategy = DEF_RECV_FT_STRATEGY;
-  settings.recv_ft_static_value = DEF_RECV_FT_STATIC_VALUE;
-  settings.recv_ft_interpolation_factor = DEF_RECV_FT_INTERPOLATION_FACTOR;
+  settings.ft_recv_strategy = DEF_FT_RECV_STRATEGY;
+  settings.ft_recv_static_value = DEF_FT_STATIC_RECV_VALUE;
+  settings.ft_recv_interpolation_factor = DEF_FT_RECV_INTERPOLATION_FACTOR;
 }
 
 // Resets all of the fields to be exchanged

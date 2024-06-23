@@ -49,7 +49,16 @@ void read_config(Settings &settings, State **states) {
   print_to_log(settings, "\tnum_chunks_per_rank = %d\n", settings.num_chunks_per_rank);
   print_to_log(settings, "\tsummary_frequency = %d\n", settings.summary_frequency);
   print_to_log(settings, "\tvisit_frequency = %d\n", settings.visit_frequency);
-  print_to_log(settings, "\trecv_ft_strategy = %d\n", settings.recv_ft_strategy);
+
+  print_to_log(settings, "\tft = %d\n", settings.ft);
+  if (settings.ft) {
+    print_to_log(settings, "\twith_ft_kill_x = %d\n", settings.with_ft_kill_x);
+    print_to_log(settings, "\twith_ft_kill_y = %d\n", settings.with_ft_kill_y);
+    print_to_log(settings, "\twith_ft_kill_iter = %d\n", settings.with_ft_kill_iter);
+    print_to_log(settings, "\tft_recv_strategy = %d\n", settings.ft_recv_strategy);
+    print_to_log(settings, "\tft_recv_static_value = %f\n", settings.ft_recv_static_value);
+    print_to_log(settings, "\tft_recv_interpolation_factor = %f\n", settings.ft_recv_interpolation_factor);
+  }
 
   for (int ss = 0; ss < settings.num_states; ++ss) {
     print_to_log(settings, "\t\nstate %d\n", ss);
@@ -94,6 +103,12 @@ void read_settings(FILE *tea_in, Settings &settings) {
     if (starts_get_double("eps", line, word, &settings.eps)) continue;
     if (starts_get_int("num_chunks_per_rank", line, word, &settings.num_chunks_per_rank)) continue;
     if (starts_get_int("halo_depth", line, word, &settings.halo_depth)) continue;
+    // Fault-tolerance config
+    if (starts_get_int("with_ft_kill_x", line, word, &settings.with_ft_kill_x)) continue;
+    if (starts_get_int("with_ft_kill_y", line, word, &settings.with_ft_kill_y)) continue;
+    if (starts_get_int("with_ft_kill_iter", line, word, &settings.with_ft_kill_iter)) continue;
+    if (starts_get_double("with_ft_recv_static_value", line, word, &settings.ft_recv_static_value)) continue;
+    if (starts_get_double("with_ft_recv_interpolation_factor", line, word, &settings.ft_recv_interpolation_factor)) continue;
 
     // Parse the switches
     if (starts_with("check_result", line)) {
@@ -145,32 +160,26 @@ void read_settings(FILE *tea_in, Settings &settings) {
       continue;
     }
     // Fault-tolerance config
+    if (starts_with("use_ft_recv_static_strategy", line)) {
+      settings.ft_recv_strategy = RecvFaultToleranceStrategy::STATIC;
+      continue;
+    }
+    if (starts_with("use_ft_recv_mirror_strategy", line)) {
+      settings.ft_recv_strategy = RecvFaultToleranceStrategy::MIRROR;
+      continue;
+    }
+    if (starts_with("use_ft_recv_bridge_strategy", line)) {
+      settings.ft_recv_strategy = RecvFaultToleranceStrategy::BRIDGE;
+      continue;
+    }
+    if (starts_with("use_ft_recv_interpolation_strategy", line)) {
+      settings.ft_recv_strategy = RecvFaultToleranceStrategy::INTERPOLATION;
+      continue;
+    }
     if (starts_with("use_ft", line)) {
       settings.ft = true;
       continue;
     }
-    if (starts_get_int("with_ft_kill_x", line, word, &settings.with_ft_kill_x)) continue;
-    if (starts_get_int("with_ft_kill_y", line, word, &settings.with_ft_kill_y)) continue;
-    if (starts_get_int("with_ft_kill_iter", line, word, &settings.with_ft_kill_iter)) continue;
-    if (starts_with("use_recv_ft_static_strategy", line)) {
-      settings.recv_ft_strategy = RecvFaultToleranceStrategy::STATIC;
-      continue;
-    }
-    if (starts_get_double("with_recv_ft_static_value", line, word, &settings.recv_ft_static_value)) continue;
-    if (starts_with("use_recv_ft_mirror_strategy", line)) {
-      settings.recv_ft_strategy = RecvFaultToleranceStrategy::MIRROR;
-      continue;
-    }
-    if (starts_with("use_recv_ft_bridge_strategy", line)) {
-      settings.recv_ft_strategy = RecvFaultToleranceStrategy::BRIDGE;
-      continue;
-    }
-    if (starts_with("use_recv_ft_interpolation_strategy", line)) {
-      settings.recv_ft_strategy = RecvFaultToleranceStrategy::INTERPOLATION;
-      continue;
-    }
-    if (starts_get_double("with_recv_ft_interpolation_factor", line, word, &settings.recv_ft_interpolation_factor)) continue;
-    // Test fault-tolerance
   }
 
   // Set the cell widths now
@@ -259,6 +268,8 @@ int read_states(FILE *tea_in, Settings &settings, State **states) {
   return num_states;
 }
 
+#include <iostream>
+#include <string>
 // Checks line starts with word
 bool starts_with(const char *word, const char *line) {
   int num_matched = 0;

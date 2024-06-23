@@ -3,6 +3,7 @@
 #include "drivers.h"
 #include "vtk_visitor.h"
 
+#include <iostream>
 #include <signal.h>
 
 double calc_dt(Chunk *chunks);
@@ -18,9 +19,11 @@ bool diffuse(Chunk *chunks, Settings &settings) {
 
   for (tt = 1; tt <= settings.end_step; ++tt) {
     // Inject failure at given step on given coords
-    if (settings.ft                                                                                                       //
+    if (settings.ft                                                                                                           //
         && settings.cart_coords[X_AXIS] == settings.with_ft_kill_x && settings.cart_coords[Y_AXIS] == settings.with_ft_kill_y //
         && tt == settings.with_ft_kill_iter) {
+      std::cout << "XXX - rank:" << settings.rank << " - cart-rank:" << settings.cart_rank << " - cart-coords:("
+                << settings.cart_coords[X_AXIS] << "," << settings.cart_coords[Y_AXIS] << ")" << std::endl;
       raise(SIGKILL);
     }
 

@@ -17,9 +17,9 @@
 #define DEF_WITH_FT_KILL_X 0
 #define DEF_WITH_FT_KILL_Y 0
 #define DEF_WITH_FT_KILL_ITER 0
-#define DEF_RECV_FT_STRATEGY RecvFaultToleranceStrategy::INTERPOLATION
-#define DEF_RECV_FT_STATIC_VALUE 0.00001
-#define DEF_RECV_FT_INTERPOLATION_FACTOR 0.001
+#define DEF_FT_RECV_STRATEGY RecvFaultToleranceStrategy::INTERPOLATION
+#define DEF_FT_STATIC_RECV_VALUE 0.00001
+#define DEF_FT_RECV_INTERPOLATION_FACTOR 0.001
 #define DEF_GRID_X_MIN 0.0
 #define DEF_GRID_Y_MIN 0.0
 #define DEF_GRID_Z_MIN 0.0
@@ -117,9 +117,9 @@ struct Settings {
   int with_ft_kill_x;
   int with_ft_kill_y;
   int with_ft_kill_iter;
-  RecvFaultToleranceStrategy recv_ft_strategy;
-  double recv_ft_static_value;
-  double recv_ft_interpolation_factor;
+  RecvFaultToleranceStrategy ft_recv_strategy;
+  double ft_recv_static_value;
+  double ft_recv_interpolation_factor;
 
   Solver solver;
   char *solver_name;

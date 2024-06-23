@@ -32,7 +32,7 @@ void send_recv_message(Settings &settings, double *send_buffer, double *recv_buf
 
   if (settings.ft) {
     recover_on_fault(cart_communicator, settings.cart_rank, neighbour_rank, rc,                                       //
-                     settings.recv_ft_strategy, settings.recv_ft_static_value, settings.recv_ft_interpolation_factor, //
+                     settings.ft_recv_strategy, settings.ft_recv_static_value, settings.ft_recv_interpolation_factor, //
                      send_buffer, recv_buffer, buffer_len);
   }
 

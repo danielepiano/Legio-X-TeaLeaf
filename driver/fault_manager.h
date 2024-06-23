@@ -14,5 +14,5 @@
 enum class RecvFaultToleranceStrategy { STATIC, MIRROR, BRIDGE, INTERPOLATION };
 
 void recover_on_fault(MPI_Comm communicator, int rank, int neighbour_rank, int rc,                                   //
-                      RecvFaultToleranceStrategy recv_ft_strategy, double static_value, double interpolation_factor, //
+                      RecvFaultToleranceStrategy ft_recv_strategy, double static_value, double interpolation_factor, //
                       double *send_buffer, double *recv_buffer, int buffer_len);

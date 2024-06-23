@@ -2,9 +2,9 @@
 #include "settings.h"
 
 void recover_on_first_fault(MPI_Comm communicator,                                                 //
-                            enum RecvFaultToleranceStrategy recv_ft_strategy, double static_value, //
+                            enum RecvFaultToleranceStrategy ft_recv_strategy, double static_value, //
                             double *send_buffer, double *recv_buffer, int buffer_len) {
-  switch (recv_ft_strategy) {
+  switch (ft_recv_strategy) {
     case RecvFaultToleranceStrategy::STATIC: {
       for (int ii = 0; ii < buffer_len; ++ii) {
         recv_buffer[ii] = static_value;
@@ -31,12 +31,12 @@ void recover_on_first_fault(MPI_Comm communicator,                              
 }
 
 void recover_on_fault(MPI_Comm communicator, int rank, int neighbour_rank, int rc,                                        //
-                      enum RecvFaultToleranceStrategy recv_ft_strategy, double static_value, double interpolation_factor, //
+                      enum RecvFaultToleranceStrategy ft_recv_strategy, double static_value, double interpolation_factor, //
                       double *send_buffer, double *recv_buffer, int buffer_len) {
   if (rc == MPIX_ERR_PROC_FAILED) {
-    recover_on_first_fault(communicator, recv_ft_strategy, static_value, send_buffer, recv_buffer, buffer_len);
+    recover_on_first_fault(communicator, ft_recv_strategy, static_value, send_buffer, recv_buffer, buffer_len);
   }
-  if (recv_ft_strategy == RecvFaultToleranceStrategy::INTERPOLATION) {
+  if (ft_recv_strategy == RecvFaultToleranceStrategy::INTERPOLATION) {
     // Fetch our and neighbour's coordinates
     int send_coords[2], recv_coords[2];
     MPI_Cart_coords(communicator, rank, 2, send_coords);
