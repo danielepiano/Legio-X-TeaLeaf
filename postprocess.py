@@ -1,12 +1,17 @@
 import glob
+import logging
 from collections import OrderedDict
 
 import vtk
 
+log = logging.getLogger("postprocess")
+logging.basicConfig(format='%(asctime)s [%(levelname)s] :: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',
+                    level=logging.INFO)
+
 
 def decode_filename(vtk_filenames):
     """Extract info from VTK filenames and group dumps by iteration."""
-    print("... decoding filenames ...")
+    log.debug("... decoding filenames ...")
     vtk_files_info = {}
     for vtk_filename in vtk_filenames:
         # tea . x . y . iter . vtk
@@ -22,7 +27,6 @@ def decode_filename(vtk_filenames):
             "filename": vtk_filename
         })
     vtk_files_info = OrderedDict(sorted(vtk_files_info.items()))
-    print(">> Filenames decoded.")
     # vtk_files_info : dict [iter] -> {x.y: ... ,  filename: ...}
     return vtk_files_info
 
@@ -32,7 +36,7 @@ def recover_missing_files(vtk_files_info):
     last_vtk_filename_per_xy = {}
 
     for iter in vtk_files_info:
-        print(f"... checking missing VTK files for iter. no. {iter}")
+        log.debug(f"... checking missing VTK files for iter. no. {iter}")
 
         xys = {vtk["x.y"] for vtk in vtk_files_info[iter]}
         missing_xys = last_vtk_filename_per_xy.keys() - xys
@@ -43,20 +47,18 @@ def recover_missing_files(vtk_files_info):
                 "filename""": last_vtk_filename_per_xy[missing_xy]
             })
             if iter != 0:
-                print(
-                    f">> Missing VTK file for chunk {missing_xy} on iter. no. {iter}: re-using {last_vtk_filename_per_xy[missing_xy]}")
+                log.debug(
+                    f"Missing VTK file for chunk {missing_xy} on iter. no. {iter}: re-using {last_vtk_filename_per_xy[missing_xy]}")
 
         for vtk in vtk_files_info[iter]:
             last_vtk_filename_per_xy[vtk["x.y"]] = vtk["filename"]
 
         vtk_files_info[iter] = sorted(vtk_files_info[iter], key=lambda item: item["x.y"])
 
-    print(">> Missing VTK files recovered.")
-
 
 def merge_vtk_file(iter, num_y_chunks, vtk_iter_files_info):
     """Merge VTK files related to the same iteration."""
-    print(f"... merging VTK files for iter. no. {iter}")
+    log.debug(f"... merging VTK files for iter. no. {iter}")
 
     for file_info in vtk_iter_files_info:
         vtk_file = read_vtk_file(file_info["filename"])
@@ -66,13 +68,13 @@ def merge_vtk_file(iter, num_y_chunks, vtk_iter_files_info):
     density, energy, temperature = merge_cell_data(num_y_chunks, vtk_iter_files_info)
     vtk_out = build_vtk_file(x_coords, y_coords, z_coords, density, energy, temperature)
 
-    print(f">> Merge completed for iter. no. {iter}.")
+    log.debug(f"Merge completed for iter. no. {iter}.")
     return vtk_out
 
 
 def read_vtk_file(filename) -> vtk.vtkRectilinearGrid:
     """Read a VTK file given the filename."""
-    print(f"... reading {filename} ...")
+    log.debug(f"... reading {filename} ...")
     reader = vtk.vtkRectilinearGridReader()
     reader.SetFileName(filename)
     reader.Update()
@@ -187,28 +189,30 @@ def build_vtk_file(x_coords, y_coords, z_coords, density, energy, temperature):
 
 def write_vtk_file(iter, destination, vtk_out, binary_format=False):
     """Writing the VTK file for a given iteration."""
-    print(f"... printing the VTK file for the iter. no. {iter} ...")
+    log.debug(f"... printing the VTK file for the iter. no. {iter} ...")
     writer = vtk.vtkRectilinearGridWriter().NewInstance()
     writer.SetFileName(destination)
     writer.SetInputData(vtk_out)
     if binary_format:
         writer.SetFileTypeToBinary()
     writer.Write()
-    print(f">> VTK file printed for iter. no. {iter} as {destination}.")
+    log.debug(f"VTK file printed for iter. no. {iter} as {destination}.")
 
 
-def main(input_dir, output_dir, output_prefix,  binary_format, grid_y_chunks):
+def main(input_dir, output_dir, output_prefix, binary_format, grid_y_chunks):
     # Get list of VTK files in the input directory
     vtk_filenames = glob.glob(f"{input_dir}/*.vtk")
     if not vtk_filenames:
-        print(">> No VTK files found in the specified directory.")
+        log.info("No VTK files found in the specified directory.")
         return
 
-    print()
-    print(">> Postprocessing started...")
+    log.info("Postprocessing started...")
 
     vtk_files_info = decode_filename(vtk_filenames)
+    log.info("Filenames decoded.")
+
     recover_missing_files(vtk_files_info)
+    log.info("Missing VTK files recovered.")
 
     for iter in vtk_files_info:
         vtk_out = merge_vtk_file(iter, grid_y_chunks, vtk_files_info[iter])
@@ -216,7 +220,7 @@ def main(input_dir, output_dir, output_prefix,  binary_format, grid_y_chunks):
         os.path.join(output_dir, output_filename)
         write_vtk_file(iter, os.path.join(output_dir, output_filename), vtk_out, binary_format)
 
-    print(">> Postprocessing finished successfully.")
+    log.info("Postprocessing finished successfully.")
 
 
 if __name__ == "__main__":
@@ -263,16 +267,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if not os.path.exists(args.input):
-        print(f">> '{args.input}' path does not exist.")
+        log.error(f"'{args.input}' path does not exist.")
         exit(1)
-    if not os.path.exists(args.output):
-        print(f"!! One or more directories in '{args.output}' do not exist.")
-        os.makedirs(args.output, exist_ok=True)
-        print(f">> Missing directories in '{args.output}' created.")
     tea_visit_filename = os.path.join(args.visit, 'tea.visit')
     if not os.path.isfile(tea_visit_filename):
-        print(f">> '{tea_visit_filename}' file does not exist.")
+        log.error(f"'{tea_visit_filename}' file does not exist.")
         exit(1)
+    if not os.path.exists(args.output):
+        log.debug(f"One or more directories in '{args.output}' do not exist.")
+        os.makedirs(args.output, exist_ok=True)
+        log.info(f"Missing directories in '{args.output}' created.")
 
     visit_vars = {}
     with open(tea_visit_filename, 'r') as tea_visit:
@@ -292,9 +296,9 @@ if __name__ == "__main__":
 
     if args.rm:
         vtk_filenames = glob.glob(f"{args.input}/*.vtk")
-        print(f">> Deleting VTK files in {args.input}/*.vtk")
+        log.info(f"Deleting VTK files in {args.input}/*.vtk")
         for vtk_filename in vtk_filenames:
             try:
                 os.remove(vtk_filename)
             except Exception as e:
-                print(f"!! Error deleting VTK file {vtk_filename}: {e}")
+                log.error(f"Error deleting VTK file {vtk_filename}: {e}")
