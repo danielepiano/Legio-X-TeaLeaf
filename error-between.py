@@ -1,12 +1,16 @@
 import glob
-from collections import OrderedDict
+import logging
 
 import vtk
+
+log = logging.getLogger("postprocess")
+logging.basicConfig(format='%(asctime)s [%(levelname)s] :: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',
+                    level=logging.INFO)
 
 
 def decode_filename(vtk_filenames):
     """Extract info from VTK filenames and group dumps by x,y,iteration."""
-    print("... decoding filenames ...")
+    log.debug("... decoding filenames ...")
     vtk_files_info = {}
     for vtk_filename in vtk_filenames:
         # tea . iter . vtk
@@ -17,14 +21,13 @@ def decode_filename(vtk_filenames):
             "filename": vtk_filename
         }
 
-    print(">> Filenames decoded.")
     # vtk_files_info : dict [iter] -> {filename: ...}
     return vtk_files_info
 
 
 def compute_error(iter, vtk_exp_filename, vtk_act_filename):
     """Compute absolute error between two VTK file describing the same iteration"""
-    print(f"... computing error for VTK files of iter. no. {iter}")
+    log.debug(f"... computing error for VTK files of iter. no. {iter}")
 
     vtk_exp_file = read_vtk_file(vtk_exp_filename)
     vtk_act_file = read_vtk_file(vtk_act_filename)
@@ -37,7 +40,7 @@ def compute_error(iter, vtk_exp_filename, vtk_act_filename):
 
 def read_vtk_file(filename) -> vtk.vtkRectilinearGrid:
     """Read a VTK file given the filename."""
-    print(f"... reading {filename} ...")
+    log.debug(f"... reading {filename} ...")
     reader = vtk.vtkRectilinearGridReader()
     reader.SetFileName(filename)
     reader.Update()
@@ -130,33 +133,33 @@ def build_vtk_file(x_coords, y_coords, z_coords, density, energy, temperature):
 
 def write_vtk_file(iter, destination, vtk_out, binary_format=False):
     """Writing the VTK file for a given iteration."""
-    print(f"... printing the VTK file for the iter. no. {iter} ...")
+    log.debug(f"... printing the VTK file for the iter. no. {iter} ...")
     writer = vtk.vtkRectilinearGridWriter().NewInstance()
     writer.SetFileName(destination)
     writer.SetInputData(vtk_out)
     if binary_format:
         writer.SetFileTypeToBinary()
     writer.Write()
-    print(f">> VTK file printed for iter. no. {iter} as {destination}.")
+    log.debug(f"VTK file printed for iter. no. {iter} as {destination}.")
 
 
 def main(expected_dir, actual_dir, output_dir, output_prefix, binary_format):
     # Get list of VTK files in the input directory
     vtk_exp_filenames = glob.glob(f"{expected_dir}/*.vtk")
     if not vtk_exp_filenames:
-        print(f">> No VTK files found in the specified directory: {expected_dir}")
+        log.info(f"No VTK files found in the specified directory: {expected_dir}")
         return
 
     vtk_act_filenames = glob.glob(f"{actual_dir}/*.vtk")
     if not vtk_act_filenames:
-        print(f">> No VTK files found in the specified directory:{actual_dir}")
+        log.info(f"No VTK files found in the specified directory:{actual_dir}")
         return
 
-    print()
-    print(">> Error computation started...")
+    log.info("Error computation started...")
 
     vtk_exp_files_info = decode_filename(vtk_exp_filenames)
     vtk_act_files_info = decode_filename(vtk_act_filenames)
+    log.info("Filenames decoded.")
 
     for iter in vtk_exp_files_info.keys():
         vtk_exp_filename = vtk_exp_files_info[iter]["filename"]
@@ -166,7 +169,7 @@ def main(expected_dir, actual_dir, output_dir, output_prefix, binary_format):
         os.path.join(output_dir, output_filename)
         write_vtk_file(iter, os.path.join(output_dir, output_filename), vtk_out, binary_format)
 
-    print(">> Error computation finished successfully.")
+    log.info("Error computation finished successfully.")
 
 
 if __name__ == "__main__":
@@ -202,15 +205,15 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if not os.path.exists(args.expected):
-        print(f">> '{args.expected}' path does not exist.")
+        log.error(f"'{args.expected}' path does not exist.")
         exit(1)
     if not os.path.exists(args.actual):
-        print(f">> '{args.actual}' path does not exist.")
+        log.error(f"'{args.actual}' path does not exist.")
         exit(1)
     args.output = args.actual + "/error"
     if not os.path.exists(args.output):
         os.makedirs(args.output, exist_ok=True)
-        print(f">> '{args.output}' directory created.")
+        log.info(f"'{args.output}' directory created.")
 
     print(f"-- Expected values' files directory:\t{args.expected}")
     print(f"-- Actual values' files directory:\t{args.actual}")
