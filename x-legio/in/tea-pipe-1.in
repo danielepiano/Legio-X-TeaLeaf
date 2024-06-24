@@ -38,4 +38,6 @@ visit_frequency=10
 
 #check_result
 
+use_c_kernels
+
 *endtea
