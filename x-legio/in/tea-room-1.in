@@ -6,7 +6,7 @@ xmax=100.0
 ymax=100.0
 
 state 1 density 0.03 energy 0.000001
-state 2 density 0.05 energy 200000000.0 geometry rectangular xmin 45.0 ymin 55.0 xmax 69.0 ymax 80.0
+state 2 density 0.05 energy 200000000.0 geometry rectangle xmin 45.0 ymin 55.0 xmax 69.0 ymax 80.0
 state 3 density 0.05 energy 200000000.0 geometry circular xmin 15.0 ymin 20.0 radius 8.0 xmax 0.0 ymax 0.0
 state 4 density 0.05 energy 200005000.0 geometry circular xmin 63.0 ymin 31.0 radius 10.0 xmax 0.0 ymax 0.0
 
